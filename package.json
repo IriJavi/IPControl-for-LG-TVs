@@ -1,4 +1,10 @@
 {
+  "name": "lg-tv-remote-panel",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
   "dependencies": {
     "express": "^5.2.1",
     "lgtv2": "^1.6.3"

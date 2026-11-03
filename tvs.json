@@ -1,6 +1,5 @@
 [
-  { "name": "CCR4", "ip": "10.137.73.35", "group": "office" },
-  { "name": "CCR3", "ip": "10.137.73.53", "group": "office" },
-  { "name": "CCR2", "ip": "10.137.73.46", "group": "office" },
-  { "name": "CCR1", "ip": "10.137.73.54", "group": "office" }
+  { "name": "CCR-04", "ip": "10.137.73.55", "group": "CCR" },
+  { "name": "CCR-02", "ip": "10.137.73.61", "group": "CCR" },
+  { "name": "CCR-01", "ip": "10.137.73.34", "group": "CCR" }
 ]

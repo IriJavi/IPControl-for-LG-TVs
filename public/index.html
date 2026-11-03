@@ -1,0 +1,1494 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LG TV Control</title>
+  <style>
+    :root {
+      --bg: #dfe5ea;
+      --bg-deep: #c6ced6;
+      --panel: #eef2f5;
+      --panel-strong: #dfe6eb;
+      --light: #ffffff;
+      --dark: #2c3440;
+      --dark-soft: #3c4756;
+      --line: #a5b0bc;
+      --line-strong: #788796;
+      --text: #1a1f26;
+      --muted: #4d5968;
+      --blue: #5a7ea8;
+      --blue-soft: #dfeaf7;
+      --green: #4a8b68;
+      --green-soft: #dfeee6;
+      --red: #a6434a;
+      --red-soft: #f1dfe0;
+      --amber: #9d7c2b;
+      --amber-soft: #f4ecda;
+      --shadow: rgba(0,0,0,0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+      color: var(--text);
+      font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+
+    body {
+      padding: 18px;
+    }
+
+    .shell {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: var(--panel);
+      border: 2px solid var(--line-strong);
+      box-shadow: 0 0 0 3px #f8f9fb, 0 10px 18px var(--shadow);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 2px solid var(--line-strong);
+      background: linear-gradient(180deg, #edf1f5 0%, #dfe6ec 100%);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge {
+      border: 2px solid var(--line-strong);
+      background: var(--blue-soft);
+      padding: 6px 10px;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle {
+      font-size: 0.74rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 2px solid var(--line-strong);
+      background: linear-gradient(180deg, #f5f8fb 0%, #dde5ee 100%);
+      color: var(--dark);
+      font-family: inherit;
+      font-weight: 700;
+      padding: 9px 12px;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+
+    #scanRangeBtn {
+      width: 96px;
+      min-width: 96px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    button:hover { filter: brightness(0.98); }
+    .primary { background: linear-gradient(180deg, #dfeaf7 0%, #c9d9ef 100%); }
+    .success { background: linear-gradient(180deg, #e4f5ea 0%, #cfead9 100%); color: var(--green); }
+    .warning { background: linear-gradient(180deg, #f6efd9 0%, #ebddad 100%); color: #7c6320; }
+    .danger { background: linear-gradient(180deg, #f5e0e2 0%, #e8c7ca 100%); color: var(--red); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      padding: 16px 18px 0;
+    }
+
+    .stat {
+      background: linear-gradient(180deg, #f9fafb 0%, #ebf0f4 100%);
+      border: 2px solid var(--line);
+      min-height: 96px;
+      padding: 12px 14px;
+      position: relative;
+    }
+
+    .stat .label {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .stat .value {
+      font-size: clamp(1.8rem, 2vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.05em;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 330px minmax(0, 1fr);
+      gap: 16px;
+      padding: 16px 18px 18px;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, #f2f5f8 0%, #e8edf3 100%);
+      border: 2px solid var(--line);
+      min-height: 500px;
+      padding: 12px;
+    }
+
+    .panel-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--dark);
+    }
+
+    .search {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 2px solid var(--line);
+      background: #fff;
+      padding: 8px 10px;
+      font: inherit;
+      color: var(--text);
+    }
+
+    .device-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 740px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .overview-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .overview-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border: 2px solid var(--line);
+      background: linear-gradient(180deg, #f9fbfd 0%, #edf3f8 100%);
+      padding: 10px 12px;
+    }
+
+    .overview-item-main {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .overview-item-name {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .overview-item-meta {
+      font-size: 0.74rem;
+      color: var(--muted);
+    }
+
+    .scan-status {
+      margin: 0 0 10px;
+      border: 2px solid var(--line-strong);
+      background: linear-gradient(180deg, #edf3fb 0%, #dfeaf7 100%);
+      color: var(--dark);
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .scan-status.scanning {
+      background: linear-gradient(180deg, #efe9c9 0%, #f4edce 100%);
+      border-color: #8d7944;
+      animation: pulseScan 1.2s ease-in-out infinite;
+    }
+
+    @keyframes pulseScan {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .scan-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--amber);
+      box-shadow: 0 0 0 2px rgba(157,124,43,0.2);
+      display: inline-block;
+    }
+
+    .scan-card {
+      border: 2px solid var(--line);
+      background: linear-gradient(180deg, #f9fbfd 0%, #edf3f8 100%);
+      padding: 10px;
+    }
+
+    .scan-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .scan-card-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .scan-card-meta {
+      font-size: 0.74rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .scan-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .device-card {
+      border: 2px solid var(--line);
+      background: linear-gradient(180deg, #f9fbfd 0%, #edf3f8 100%);
+      padding: 10px;
+    }
+
+    .device-card.selected {
+      border-color: var(--blue);
+      background: linear-gradient(180deg, #edf4ff 0%, #ddeaf9 100%);
+      box-shadow: inset 0 0 0 1px rgba(90, 126, 168, 0.15);
+    }
+
+    .overview-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border: 2px solid var(--line);
+      background: linear-gradient(180deg, #f9fbfd 0%, #edf3f8 100%);
+      padding: 10px 12px;
+    }
+
+    .overview-item.selected {
+      border-color: var(--blue);
+      background: linear-gradient(180deg, #edf4ff 0%, #ddeaf9 100%);
+      box-shadow: inset 0 0 0 1px rgba(90, 126, 168, 0.15);
+    }
+
+    .device-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .device-name {
+      font-weight: 700;
+      font-size: 0.98rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      border: 1px solid rgba(0,0,0,0.25);
+    }
+    .dot.online { background: var(--green); }
+    .dot.offline { background: var(--red); }
+
+    .device-meta {
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .device-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid var(--line);
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      border: 2px solid var(--line);
+      background: #f3f6f9;
+      padding: 8px 12px;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: var(--blue-soft);
+      color: var(--dark);
+      border-color: var(--line-strong);
+    }
+
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .quick-card {
+      border: 2px solid var(--line);
+      background: linear-gradient(180deg, #f9fafb 0%, #edf3f7 100%);
+      padding: 12px;
+    }
+
+    .quick-card h3 {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+
+    .tv-card {
+      border: 2px solid var(--line);
+      background: linear-gradient(180deg, #f9fafb 0%, #eef3f8 100%);
+      padding: 12px;
+    }
+
+    .tv-card.selected {
+      border-color: var(--blue);
+      background: linear-gradient(180deg, #edf4ff 0%, #ddeaf9 100%);
+      box-shadow: inset 0 0 0 1px rgba(90, 126, 168, 0.15);
+    }
+
+    .tv-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .tv-name {
+      font-weight: 700;
+    }
+
+    .state-pill {
+      border: 2px solid var(--line-strong);
+      display: inline-block;
+      padding: 4px 7px;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .state-pill.online { background: var(--green-soft); color: var(--green); }
+    .state-pill.offline { background: var(--red-soft); color: var(--red); }
+
+    .tv-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .tiny-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    .console {
+      border: 2px solid var(--line);
+      background: linear-gradient(180deg, #f9fafb 0%, #edf3f8 100%);
+      overflow: hidden;
+    }
+
+    .console-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-bottom: 2px solid var(--line);
+      background: linear-gradient(180deg, #eef2f6 0%, #e2e8ef 100%);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.76rem;
+    }
+
+    .console-output {
+      min-height: 180px;
+      max-height: 260px;
+      overflow: auto;
+      padding: 12px;
+      background: #f7f9fb;
+      white-space: pre-wrap;
+      line-height: 1.5;
+      font-family: Consolas, monospace;
+      font-size: 0.82rem;
+      color: var(--dark);
+    }
+
+    .console-input {
+      border-top: 2px solid var(--line);
+      padding: 12px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      background: #f3f6f8;
+      border: 2px solid var(--line-strong);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      padding: 10px 14px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.2s ease;
+      pointer-events: none;
+      z-index: 50;
+      font-weight: 700;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(23, 29, 35, 0.48);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 100;
+    }
+
+    .modal[hidden] {
+      display: none !important;
+    }
+
+    .modal-panel {
+      width: min(760px, 100%);
+      background: linear-gradient(180deg, #f0f4f8 0%, #e3eaf1 100%);
+      border: 2px solid var(--line-strong);
+      box-shadow: 0 16px 32px rgba(0,0,0,0.2);
+      padding: 18px;
+    }
+
+    @media (max-width: 980px) {
+      .content { grid-template-columns: 1fr; }
+      .header { flex-direction: column; align-items: flex-start; }
+      .top-actions { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="header">
+      <div class="brand">
+        <div class="badge">OPERATIONS</div>
+        <div>
+          <h1>LG TV Control</h1>
+          <div class="subtitle">Discovery • pairing • command console</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="primary" id="discoverBtn">Discover</button>
+        <button class="success" id="keepAliveToggleBtn">KeepAlive OFF</button>
+        <button class="warning" id="volumeAllBtn">Lower all</button>
+        <button id="refreshBtn">Refresh</button>
+      </div>
+    </header>
+
+    <section class="stats">
+      <div class="stat">
+        <div class="label">Total</div>
+        <div class="value" id="statTotal">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">Online</div>
+        <div class="value" id="statOnline">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">Without key</div>
+        <div class="value" id="statMissingKey">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">KeepAlive</div>
+        <div class="value" id="statKeepAlive">OFF</div>
+      </div>
+    </section>
+
+    <div class="content">
+      <aside class="panel">
+        <div class="panel-title">
+          <span>Inventory</span>
+        </div>
+
+        <div class="search">
+          <input id="networkRangeInput" placeholder="10.137.73.0/24" value="10.137.73.0/24" />
+          <button class="primary" id="scanRangeBtn">Scan</button>
+        </div>
+
+        <div class="scan-status" id="scanStatus" hidden>
+          <span class="scan-indicator"></span>
+          <span>Ready</span>
+        </div>
+        <div class="device-list" id="scanResults"></div>
+        <div class="device-list" id="deviceList"></div>
+      </aside>
+
+      <main class="panel">
+        <div class="tabs">
+          <button class="tab active" data-tab="overview">Overview</button>
+          <button class="tab" data-tab="devices">TVs</button>
+          <button class="tab" data-tab="commands">Commands</button>
+        </div>
+
+        <section class="tab-pane active" data-pane="overview">
+          <div class="panel-title">
+            <span>Quick actions</span>
+            <span class="status-badge" style="display:inline-flex;align-items:center;gap:8px;border:2px solid var(--line);padding:6px 8px;font-size:0.76rem;">
+              <span class="dot offline" id="globalDot"></span>
+              <span id="globalStatus">No selection</span>
+            </span>
+          </div>
+
+          <div class="quick-grid">
+            <div class="quick-card">
+              <h3>Power</h3>
+              <div class="quick-actions">
+                <button class="success" id="powerOnBtn">On</button>
+                <button class="danger" id="powerOffBtn">Off</button>
+              </div>
+            </div>
+
+            <div class="quick-card">
+              <h3>Volume</h3>
+              <div class="quick-actions">
+                <button class="warning" id="volumeDownBtn">Down</button>
+                <button id="volumeUpBtn">Up</button>
+              </div>
+            </div>
+
+            <div class="quick-card">
+              <h3>Launcher</h3>
+              <div class="quick-actions">
+                <button class="primary" id="dashboardBtn">Open</button>
+                <button id="reloadBtn">Reload</button>
+              </div>
+            </div>
+
+            <div class="quick-card">
+              <h3>Keys</h3>
+              <div class="quick-actions">
+                <button class="primary" id="keysStatusBtn">Status</button>
+                <button class="danger" id="resetKeysBtn">Reset</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-title" style="margin-top: 18px;">
+            <span>Pool</span>
+          </div>
+          <div class="overview-list" id="overviewDeviceList"></div>
+        </section>
+
+        <section class="tab-pane" data-pane="devices">
+          <div class="panel-title">
+            <span>TV status</span>
+            <button class="primary" id="configOpenBtn">Config</button>
+          </div>
+          <div class="grid-cards" id="deviceGrid"></div>
+        </section>
+
+        <section class="tab-pane" data-pane="commands">
+          <div class="console">
+            <div class="console-head">
+              <span>SSAP command console</span>
+              <button class="primary" id="sendCommandBtn">Send</button>
+            </div>
+            <div class="console-output" id="consoleOutput">LG controller ready
+
+Examples:
+ssap://audio/getVolume
+ssap://system/turnOff
+ssap://audio/volumeDown</div>
+            <div class="console-input">
+              <input id="customCommandInput" value="ssap://audio/getVolume" />
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div id="deviceConfigModal" class="modal" hidden>
+    <div class="modal-panel">
+      <div class="panel-title">
+        <span>Device config</span>
+        <button id="closeConfigModalBtn" class="ghost">Close</button>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Name</label>
+          <input id="deviceName" placeholder="Meeting room TV" />
+        </div>
+        <div class="field">
+          <label>IP</label>
+          <input id="deviceIp" placeholder="192.168.1.50" />
+        </div>
+        <div class="field">
+          <label>MAC</label>
+          <input id="deviceMac" placeholder="AA:BB:CC:DD:EE:FF" />
+        </div>
+        <div class="field">
+          <label>Group</label>
+          <input id="deviceGroup" placeholder="default" />
+        </div>
+        <div class="field full">
+          <label>Notes</label>
+          <textarea id="deviceNotes" placeholder="Primary TV in the meeting room..."></textarea>
+        </div>
+      </div>
+
+      <div class="device-actions" style="margin-top: 16px;">
+        <button class="primary" id="saveDeviceBtn">Save device</button>
+        <button id="clearFormBtn">Clear</button>
+        <button class="danger" id="deleteDeviceBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      devices: [],
+      selectedId: null,
+      selectedIds: [],
+      keepAlive: false,
+      filter: 'all',
+      search: '',
+      logs: [],
+      scanResults: [],
+      scanning: false,
+      scanRequestId: 0,
+      scanAbortController: null,
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const toast = $('toast');
+
+    function setScanButtonState() {
+      const button = $('scanRangeBtn');
+      button.textContent = state.scanning ? 'Stop' : 'Scan';
+      button.classList.toggle('danger', state.scanning);
+      button.classList.toggle('primary', !state.scanning);
+    }
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    function appendLog(msg) {
+      const stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      state.logs.unshift(`${stamp} ${msg}`);
+      state.logs = state.logs.slice(0, 18);
+      $('consoleOutput').textContent = state.logs.join('\n');
+    }
+
+    function setScanStatus(message, isScanning = false) {
+      const banner = $('scanStatus');
+      const label = banner.querySelector('span:last-child');
+      banner.hidden = false;
+      banner.classList.toggle('scanning', isScanning);
+      label.textContent = message;
+    }
+
+    function hideScanStatus() {
+      const banner = $('scanStatus');
+      const label = banner.querySelector('span:last-child');
+      banner.hidden = true;
+      banner.classList.remove('scanning');
+      label.textContent = 'Ready';
+    }
+
+    function cancelScanUI(message = 'Scan stopped') {
+      state.scanRequestId += 1;
+      state.scanning = false;
+      if (state.scanAbortController) {
+        state.scanAbortController.abort();
+        state.scanAbortController = null;
+      }
+      setScanButtonState();
+      if (state.scanResults && state.scanResults.length) {
+        setScanStatus(`${state.scanResults.length} TV(s) found`, false);
+      } else {
+        hideScanStatus();
+      }
+      showToast(message);
+    }
+
+    async function api(url, method = 'GET', body, signal = null) {
+      const options = { method, headers: { 'Content-Type': 'application/json' } };
+      if (body !== undefined) options.body = JSON.stringify(body);
+      if (signal) options.signal = signal;
+
+      const res = await fetch(url, options);
+      const text = await res.text();
+      try { return text ? JSON.parse(text) : { status: 'ok' }; }
+      catch { return { status: res.ok ? 'ok' : 'error', raw: text }; }
+    }
+
+    function getSelectedDevice() {
+      if (state.selectedIds.length === 1) {
+        return state.devices.find((device) => device.id === state.selectedIds[0]) || null;
+      }
+      return state.devices.find((device) => device.id === state.selectedId) || null;
+    }
+
+    function getSelectedDevices() {
+      const ids = state.selectedIds.length ? state.selectedIds : (state.selectedId ? [state.selectedId] : []);
+      return state.devices.filter((device) => ids.includes(device.id));
+    }
+
+    function setSelection(ids) {
+      state.selectedIds = Array.from(new Set(ids.filter(Boolean)));
+      state.selectedId = state.selectedIds.length === 1 ? state.selectedIds[0] : null;
+
+      if (state.selectedIds.length > 1) {
+        $('globalStatus').textContent = `${state.selectedIds.length} TVs selected`;
+        $('globalDot').className = 'dot online';
+        return;
+      }
+
+      const selected = getSelectedDevice();
+      $('globalStatus').textContent = selected ? selected.name : 'No selection';
+      $('globalDot').className = `dot ${selected && selected.online ? 'online' : 'offline'}`;
+      if (selected) {
+        fillForm(selected);
+      }
+    }
+
+    function activateTab(tabName) {
+      document.querySelectorAll('.tab').forEach((item) => item.classList.toggle('active', item.dataset.tab === tabName));
+      document.querySelectorAll('.tab-pane').forEach((pane) => pane.classList.toggle('active', pane.dataset.pane === tabName));
+    }
+
+    function openConfigModal(deviceId) {
+      const selected = state.devices.find((device) => device.id === deviceId) || getSelectedDevice();
+      if (!selected) {
+        showToast('Select a TV first');
+        return;
+      }
+
+      state.selectedId = selected.id;
+      state.selectedIds = [selected.id];
+      fillForm(selected);
+      const modal = $('deviceConfigModal');
+      if (modal) {
+        modal.hidden = false;
+        modal.style.display = 'flex';
+      }
+      activateTab('devices');
+    }
+
+    function closeConfigModal() {
+      const modal = $('deviceConfigModal');
+      if (modal) {
+        modal.hidden = true;
+        modal.style.display = 'none';
+      }
+    }
+
+    function toggleDeviceSelection(deviceId) {
+      const current = state.selectedIds.includes(deviceId);
+      const next = current ? state.selectedIds.filter((id) => id !== deviceId) : [...state.selectedIds, deviceId];
+      setSelection(next);
+      renderSidebar();
+      renderCards();
+      renderOverviewList();
+    }
+
+    function fillForm(device) {
+      $('deviceName').value = device?.name || '';
+      $('deviceIp').value = device?.ip || '';
+      $('deviceMac').value = device?.mac || '';
+      $('deviceGroup').value = device?.group || 'default';
+      $('deviceNotes').value = device?.notes || '';
+    }
+
+    function clearForm() {
+      state.selectedId = null;
+      state.selectedIds = [];
+      $('deviceName').value = '';
+      $('deviceIp').value = '';
+      $('deviceMac').value = '';
+      $('deviceGroup').value = 'default';
+      $('deviceNotes').value = '';
+      $('globalStatus').textContent = 'No selection';
+      $('globalDot').className = 'dot offline';
+      renderSidebar();
+      renderCards();
+      renderOverviewList();
+    }
+
+    function filteredDevices() {
+      return state.devices.filter((device) => {
+        const matchesGroup = state.filter === 'all' || (device.group || 'default') === state.filter;
+        const text = `${device.name || ''} ${device.ip || ''} ${device.mac || ''}`.toLowerCase();
+        const matchesSearch = !state.search || text.includes(state.search.toLowerCase());
+        return matchesGroup && matchesSearch;
+      });
+    }
+
+    function renderGroupOptions() {
+      const select = $('groupFilter');
+      if (!select) return;
+      const groups = [...new Set(state.devices.map((device) => device.group || 'default'))].sort();
+      select.innerHTML = '<option value="all">All groups</option>' + groups.map((group) => `<option value="${group}">${group}</option>`).join('');
+      select.value = state.filter;
+    }
+
+    function renderScanResults() {
+      const container = $('scanResults');
+      const results = state.scanResults || [];
+
+      if (state.scanning) {
+        setScanStatus('Scanning network…', true);
+      } else if (results.length) {
+        setScanStatus(`${results.length} TV(s) found`, false);
+      } else {
+        hideScanStatus();
+      }
+
+      container.innerHTML = '';
+
+      if (!results.length) {
+        if (!state.scanning) {
+          container.innerHTML = '<div class="device-meta">No results from the last scan.</div>';
+        }
+        return;
+      }
+
+      for (const device of results) {
+        const card = document.createElement('div');
+        card.className = 'scan-card';
+        card.innerHTML = `
+          <div class="scan-card-header">
+            <div class="scan-card-title">${device.name || 'LG-TV'}</div>
+            <span class="dot online"></span>
+          </div>
+          <div class="scan-card-meta">IP: ${device.ip || 'N/A'}</div>
+          <div class="scan-card-meta">MAC: ${device.mac || 'N/A'}</div>
+          <div class="scan-actions">
+            <button class="primary" data-add-scan="${device.ip || device.id}">Add to pool</button>
+            <button class="danger" data-remove-scan="${device.ip || device.id}">Remove</button>
+          </div>
+        `;
+        container.appendChild(card);
+      }
+
+      container.querySelectorAll('[data-add-scan]').forEach((button) => {
+        button.addEventListener('click', async () => {
+          const raw = button.dataset.addScan;
+          const device = state.scanResults.find((item) => (item.ip || item.id) === raw);
+          if (!device) return;
+
+          const payload = {
+            name: device.name || `LG-TV-${String(device.ip || 'tv').split('.').pop()}`,
+            ip: device.ip || '',
+            mac: device.mac || '',
+            group: 'default',
+            notes: 'Added from automatic discovery',
+            autoDiscovered: true,
+          };
+
+          const result = await api('/api/devices', 'POST', payload);
+          if (result.status === 'ok') {
+            const savedDevice = result.device || state.devices.find((item) => (item.ip || item.id) === (device.ip || device.id));
+            state.scanResults = state.scanResults.filter((item) => (item.ip || item.id) !== raw);
+            if (savedDevice) {
+              setSelection([savedDevice.id]);
+              const connectionResult = await api(`/api/devices/${savedDevice.id}/connect`, 'POST');
+              if (connectionResult.status === 'ok') {
+                appendLog(`PAIRING -> ${savedDevice.ip || savedDevice.id} connection attempt`);
+              }
+            }
+            activateTab('overview');
+            showToast(result.message || 'TV added to pool');
+            appendLog(`ADD TO POOL ${device.ip || device.id}`);
+            await loadDevices();
+            renderScanResults();
+          } else {
+            showToast(result.message || 'Could not save');
+          }
+        });
+      });
+
+      container.querySelectorAll('[data-remove-scan]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const raw = button.dataset.removeScan;
+          state.scanResults = state.scanResults.filter((item) => (item.ip || item.id) !== raw);
+          renderScanResults();
+          showToast('Detected item removed');
+        });
+      });
+
+    }
+
+    function renderOverviewList() {
+      const list = $('overviewDeviceList');
+      const items = state.devices || [];
+      list.innerHTML = '';
+
+      if (!items.length) {
+        list.innerHTML = '<div class="device-meta">No TVs in the pool yet.</div>';
+        return;
+      }
+
+      for (const device of items) {
+        const isSelected = state.selectedIds.includes(device.id);
+        const row = document.createElement('div');
+        row.className = 'overview-item' + (isSelected ? ' selected' : '');
+        row.innerHTML = `
+          <div class="overview-item-main">
+            <div class="overview-item-name">${device.name || 'LG TV'}</div>
+            <div class="overview-item-meta">${device.ip || 'No IP'} · ${device.online ? 'Online' : 'Offline'}</div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <button class="${isSelected ? 'primary' : ''}" data-overview-select="${device.id}">${isSelected ? 'Selected' : 'Select'}</button>
+            <button class="danger" data-remove-device="${device.id}">Remove</button>
+          </div>
+        `;
+        list.appendChild(row);
+      }
+
+      list.querySelectorAll('[data-overview-select]').forEach((button) => {
+        button.addEventListener('click', () => {
+          toggleDeviceSelection(button.dataset.overviewSelect);
+        });
+      });
+
+      list.querySelectorAll('[data-remove-device]').forEach((button) => {
+        button.addEventListener('click', async (event) => {
+          event.stopPropagation();
+          const id = button.dataset.removeDevice;
+          const result = await api(`/api/devices/${id}`, 'DELETE');
+          if (result.status === 'ok') {
+            state.selectedIds = state.selectedIds.filter((selectedId) => selectedId !== id);
+            if (state.selectedId === id) state.selectedId = null;
+            showToast('Entry removed');
+            await loadDevices();
+          } else {
+            showToast(result.message || 'Error');
+          }
+        });
+      });
+    }
+
+    function renderSidebar() {
+      const list = $('deviceList');
+      list.innerHTML = '';
+      renderScanResults();
+
+      if (!(state.scanResults || []).length && !state.scanning) {
+        list.innerHTML = '<div class="device-meta">No TVs detected yet.</div>';
+      }
+    }
+
+    function renderCards() {
+      const grid = $('deviceGrid');
+      const items = filteredDevices();
+      grid.innerHTML = '';
+
+      if (!items.length) {
+        grid.innerHTML = '<div class="device-meta">No TVs available in the current filter.</div>';
+        return;
+      }
+
+      for (const device of items) {
+        const isSelected = state.selectedIds.includes(device.id) || device.id === state.selectedId;
+        const card = document.createElement('div');
+        card.className = 'tv-card' + (isSelected ? ' selected' : '');
+        card.innerHTML = `
+          <div class="tv-header">
+            <div class="tv-name">${device.name}</div>
+            <span class="state-pill ${device.online ? 'online' : 'offline'}">${device.online ? 'Online' : 'Offline'}</span>
+          </div>
+          <div class="tv-meta">IP: ${device.ip || 'N/A'}</div>
+          <div class="tv-meta">MAC: ${device.mac || 'N/A'}</div>
+          <div class="tv-meta">Group: ${device.group || 'default'}</div>
+          <div class="tv-meta">Key: ${device.keySaved ? 'Saved' : 'Missing'}</div>
+          <div class="tv-meta">Last seen: ${device.lastSeenAt ? new Date(device.lastSeenAt).toLocaleString() : 'Never'}</div>
+          <div class="tiny-actions">
+            <button class="${isSelected ? 'primary' : ''}" data-card-select="${device.id}">${isSelected ? 'Selected' : 'Select'}</button>
+            <button data-command="ssap://audio/getVolume" data-id="${device.id}">Volume</button>
+            <button class="warning" data-command="ssap://audio/volumeDown" data-id="${device.id}">Lower</button>
+            <button data-config-device="${device.id}">Config</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      }
+
+      grid.querySelectorAll('[data-card-select]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          toggleDeviceSelection(btn.dataset.cardSelect);
+        });
+      });
+
+      grid.querySelectorAll('[data-config-device]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          openConfigModal(btn.dataset.configDevice);
+        });
+      });
+
+      grid.querySelectorAll('[data-command]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const result = await api(`/api/devices/${btn.dataset.id}/command`, 'POST', { command: btn.dataset.command });
+          appendLog(`${btn.dataset.command} -> ${result.status || 'error'}`);
+          showToast(result.status === 'ok' ? 'Command sent' : result.message || 'Error');
+          await loadDevices();
+        });
+      });
+    }
+
+    function updateStats() {
+      $('statTotal').textContent = state.devices.length;
+      $('statOnline').textContent = state.devices.filter((device) => device.online).length;
+      $('statMissingKey').textContent = state.devices.filter((device) => !device.keySaved).length;
+      $('statKeepAlive').textContent = state.keepAlive ? 'ON' : 'OFF';
+    }
+
+    async function loadDevices() {
+      const data = await api('/api/devices');
+      state.devices = Array.isArray(data) ? data : Object.values(data || {});
+      updateStats();
+      renderGroupOptions();
+      renderSidebar();
+      renderCards();
+      renderOverviewList();
+
+      if (state.selectedId) {
+        const selected = getSelectedDevice();
+        if (selected) {
+          $('globalStatus').textContent = selected.name;
+          $('globalDot').className = `dot ${selected.online ? 'online' : 'offline'}`;
+          fillForm(selected);
+        }
+      }
+    }
+
+    async function loadKeepAliveState() {
+      const data = await api('/api/volume/status');
+      state.keepAlive = !!data.active;
+      const button = $('keepAliveToggleBtn');
+      button.textContent = state.keepAlive ? 'KeepAlive ON' : 'KeepAlive OFF';
+      button.className = state.keepAlive ? 'success' : 'ghost';
+      updateStats();
+    }
+
+    $('networkRangeInput').value = '10.137.73.0/24';
+
+    $('discoverBtn').addEventListener('click', async () => {
+      const raw = ($('networkRangeInput').value || '10.137.73.0/24').trim();
+      let payload = { cidr: '10.137.73.0/24' };
+
+      if (raw.includes('/')) {
+        payload = { cidr: raw };
+      } else if (raw.includes('-')) {
+        const [start, end] = raw.split('-').map((part) => part.trim());
+        payload = { startIp: start, endIp: end };
+      } else if (raw) {
+        payload = { cidr: `${raw}/24` };
+      }
+
+      state.scanning = true;
+      renderScanResults();
+      const result = await api('/api/discover', 'POST', payload);
+      state.scanning = false;
+      state.scanResults = Array.isArray(result.devices) ? result.devices : [];
+      appendLog(`DISCOVER -> ${result.count || 0} TV(s)`);
+      showToast(result.status === 'ok' ? `Discovered ${result.count || 0}` : result.message || 'Error');
+      renderScanResults();
+      await loadDevices();
+      await loadKeepAliveState();
+    });
+
+    $('scanRangeBtn').addEventListener('click', async () => {
+      if (state.scanning) {
+        cancelScanUI('Scan stopped');
+        return;
+      }
+
+      const raw = $('networkRangeInput').value.trim();
+      if (!raw) {
+        showToast('Type CIDR or range');
+        return;
+      }
+
+      let payload = {};
+      if (raw.includes('/')) {
+        payload = { cidr: raw };
+      } else if (raw.includes('-')) {
+        const [start, end] = raw.split('-').map((part) => part.trim());
+        payload = { startIp: start, endIp: end };
+      } else {
+        payload = { cidr: `${raw}/24` };
+      }
+
+      const requestId = ++state.scanRequestId;
+      state.scanning = true;
+      state.scanAbortController = new AbortController();
+      setScanButtonState();
+      renderScanResults();
+
+      try {
+        const result = await api('/api/discover/range', 'POST', payload, state.scanAbortController.signal);
+
+        if (requestId !== state.scanRequestId || !state.scanning) {
+          state.scanning = false;
+          setScanButtonState();
+          if (state.scanResults && state.scanResults.length) {
+            setScanStatus(`${state.scanResults.length} TV(s) found`, false);
+          } else {
+            hideScanStatus();
+          }
+          showToast('Scan cancelled');
+          return;
+        }
+
+        state.scanning = false;
+        state.scanResults = Array.isArray(result.devices) ? result.devices : [];
+        state.scanAbortController = null;
+        setScanButtonState();
+        appendLog(`RANGE ${JSON.stringify(payload)} -> ${result.count || 0}`);
+        showToast(result.status === 'ok' ? `Range scan: ${result.count || 0}` : result.message || 'Error');
+        renderScanResults();
+        await loadDevices();
+        await loadKeepAliveState();
+      } catch (error) {
+        if (error && error.name === 'AbortError') {
+          state.scanning = false;
+          setScanButtonState();
+          if (state.scanResults && state.scanResults.length) {
+            setScanStatus(`${state.scanResults.length} TV(s) found`, false);
+          } else {
+            hideScanStatus();
+          }
+          return;
+        }
+        throw error;
+      }
+    });
+
+    $('refreshBtn').addEventListener('click', async () => {
+      await loadDevices();
+      await loadKeepAliveState();
+      showToast('Status refreshed');
+    });
+
+    $('keysStatusBtn').addEventListener('click', async () => {
+      const data = await api('/api/keys/status');
+      const entries = Object.values(data || {});
+      const saved = entries.filter((item) => item && item.hasKey).length;
+      const missing = entries.length - saved;
+      const message = entries.length ? `Saved keys: ${saved} / Missing: ${missing}` : 'No key data available';
+      appendLog(`KEY STATUS -> ${message}`);
+      showToast(message);
+    });
+
+    $('resetKeysBtn').addEventListener('click', async () => {
+      const result = await api('/api/keys/reset', 'POST');
+      appendLog(`KEY RESET -> ${result.status || 'error'}`);
+      if (result.status === 'success') {
+        await loadDevices();
+        showToast('Keys reset');
+      } else {
+        showToast(result.message || 'Error resetting keys');
+      }
+    });
+
+    $('keepAliveToggleBtn').addEventListener('click', async () => {
+      const endpoint = state.keepAlive ? '/api/volume/stop' : '/api/volume/start';
+      const result = await api(endpoint, 'POST');
+      state.keepAlive = !state.keepAlive;
+      await loadKeepAliveState();
+      appendLog(`KEEPALIVE -> ${state.keepAlive ? 'ON' : 'OFF'}`);
+      showToast(result.status === 'ok' ? 'KeepAlive updated' : result.message || 'Error');
+    });
+
+    $('volumeAllBtn').addEventListener('click', async () => {
+      const result = await api('/api/volume/down', 'POST', { scope: 'all' });
+      appendLog(`VOLUME ALL -> ${result.status || 'error'}`);
+      showToast(result.status === 'ok' ? 'Volume lowered' : result.message || 'Error');
+    });
+
+    $('powerOnBtn').addEventListener('click', async () => {
+      const targets = getSelectedDevices();
+      if (!targets.length) return showToast('Select a TV first');
+      const results = await Promise.all(targets.map(async (device) => {
+        const result = await api(`/api/devices/${device.id}/command`, 'POST', { command: 'ssap://system/turnOn' });
+        appendLog(`POWER ON -> ${device.name} | ${result.status || 'error'}`);
+        return { device, result };
+      }));
+      const ok = results.filter(({ result }) => result.status === 'ok').length;
+      showToast(ok ? `Power command sent to ${ok} TV(s)` : 'Error');
+    });
+
+    $('powerOffBtn').addEventListener('click', async () => {
+      const targets = getSelectedDevices();
+      if (!targets.length) return showToast('Select a TV first');
+      const results = await Promise.all(targets.map(async (device) => {
+        const result = await api(`/api/devices/${device.id}/command`, 'POST', { command: 'ssap://system/turnOff' });
+        appendLog(`POWER OFF -> ${device.name} | ${result.status || 'error'}`);
+        return { device, result };
+      }));
+      const ok = results.filter(({ result }) => result.status === 'ok').length;
+      showToast(ok ? `Power off sent to ${ok} TV(s)` : 'Error');
+    });
+
+    $('volumeDownBtn').addEventListener('click', async () => {
+      const targets = getSelectedDevices();
+      if (!targets.length) return showToast('Select a TV first');
+      const results = await Promise.all(targets.map(async (device) => {
+        const result = await api(`/api/devices/${device.id}/command`, 'POST', { command: 'ssap://audio/volumeDown' });
+        appendLog(`VOLUME DOWN -> ${device.name} | ${result.status || 'error'}`);
+        return { device, result };
+      }));
+      const ok = results.filter(({ result }) => result.status === 'ok').length;
+      showToast(ok ? `Volume down sent to ${ok} TV(s)` : 'Error');
+    });
+
+    $('volumeUpBtn').addEventListener('click', async () => {
+      const targets = getSelectedDevices();
+      if (!targets.length) return showToast('Select a TV first');
+      const results = await Promise.all(targets.map(async (device) => {
+        const result = await api(`/api/devices/${device.id}/command`, 'POST', { command: 'ssap://audio/volumeUp' });
+        appendLog(`VOLUME UP -> ${device.name} | ${result.status || 'error'}`);
+        return { device, result };
+      }));
+      const ok = results.filter(({ result }) => result.status === 'ok').length;
+      showToast(ok ? `Volume up sent to ${ok} TV(s)` : 'Error');
+    });
+
+    $('dashboardBtn').addEventListener('click', async () => {
+      const targets = getSelectedDevices();
+      if (!targets.length) return showToast('Select a TV first');
+      const results = await Promise.all(targets.map(async (device) => {
+        const result = await api(`/api/devices/${device.id}/command`, 'POST', { command: 'ssap://system.launcher/open', payload: { target: 'https://www.google.com' } });
+        appendLog(`OPEN -> ${device.name} | ${result.status || 'error'}`);
+        return { device, result };
+      }));
+      const ok = results.filter(({ result }) => result.status === 'ok').length;
+      showToast(ok ? `Opened on ${ok} TV(s)` : 'Error');
+    });
+
+    $('reloadBtn').addEventListener('click', async () => {
+      const targets = getSelectedDevices();
+      if (!targets.length) return showToast('Select a TV first');
+      const results = await Promise.all(targets.map(async (device) => {
+        const result = await api(`/api/devices/${device.id}/command`, 'POST', { command: 'ssap://system.launcher/close' });
+        appendLog(`RELOAD -> ${device.name} | ${result.status || 'error'}`);
+        return { device, result };
+      }));
+      const ok = results.filter(({ result }) => result.status === 'ok').length;
+      showToast(ok ? `Reload sent to ${ok} TV(s)` : 'Error');
+    });
+
+    $('saveDeviceBtn').addEventListener('click', async () => {
+      const payload = {
+        name: $('deviceName').value.trim(),
+        ip: $('deviceIp').value.trim(),
+        mac: $('deviceMac').value.trim(),
+        group: $('deviceGroup').value.trim() || 'default',
+        notes: $('deviceNotes').value.trim(),
+      };
+
+      if (!payload.name) return showToast('Name is required');
+      if (!payload.ip && !payload.mac) return showToast('IP or MAC is required');
+
+      let result;
+      if (state.selectedId) {
+        result = await api(`/api/devices/${state.selectedId}`, 'PUT', payload);
+      } else {
+        result = await api('/api/devices', 'POST', payload);
+      }
+
+      showToast(result.status === 'ok' ? 'Saved' : result.message || 'Error');
+      await loadDevices();
+      const selected = getSelectedDevice();
+      if (selected) fillForm(selected);
+    });
+
+    $('deleteDeviceBtn').addEventListener('click', async () => {
+      const selected = getSelectedDevice();
+      if (!selected) return showToast('Select a TV first');
+      const result = await api(`/api/devices/${selected.id}`, 'DELETE');
+      showToast(result.status === 'ok' ? 'Deleted' : result.message || 'Error');
+      clearForm();
+      await loadDevices();
+    });
+
+    $('clearFormBtn').addEventListener('click', clearForm);
+    $('configOpenBtn').addEventListener('click', () => {
+      const selected = getSelectedDevice();
+      if (!selected) {
+        showToast('Select a TV first');
+        return;
+      }
+      openConfigModal(selected.id);
+    });
+
+    $('closeConfigModalBtn').addEventListener('click', closeConfigModal);
+
+    document.querySelectorAll('.tab').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        activateTab(tab);
+      });
+    });
+
+    $('deviceConfigModal').addEventListener('click', (event) => {
+      if (event.target === $('deviceConfigModal')) {
+        closeConfigModal();
+      }
+    });
+
+    $('sendCommandBtn').addEventListener('click', async () => {
+      const command = $('customCommandInput').value.trim();
+      if (!command) return showToast('Write a command');
+      const targets = getSelectedDevices();
+      if (!targets.length) return showToast('Select a TV');
+      const results = await Promise.all(targets.map(async (device) => {
+        const result = await api(`/api/devices/${device.id}/command`, 'POST', { command });
+        appendLog(`${command} -> ${device.name} | ${result.status || 'error'}`);
+        return { device, result };
+      }));
+      const ok = results.filter(({ result }) => result.status === 'ok').length;
+      showToast(ok ? `Command executed on ${ok} TV(s)` : 'Error');
+    });
+
+    async function init() {
+      setScanButtonState();
+      appendLog('LG controller ready');
+      await loadDevices();
+      await loadKeepAliveState();
+    }
+
+    init();
+    setInterval(() => {
+      loadDevices();
+      loadKeepAliveState();
+    }, 8000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+[
+  {
+    "command": "ssap://audio/getVolume",
+    "description": "Get current volume"
+  },
+  {
+    "command": "ssap://audio/setVolume",
+    "description": "Set volume. Payload: {\"volume\":10}"
+  },
+  {
+    "command": "ssap://audio/volumeUp",
+    "description": "Volume up"
+  },
+  {
+    "command": "ssap://audio/volumeDown",
+    "description": "Volume down"
+  },
+  {
+    "command": "ssap://audio/getMute",
+    "description": "Get mute status"
+  },
+  {
+    "command": "ssap://audio/setMute",
+    "description": "Set mute. Payload: {\"mute\":true}"
+  },
+  {
+    "command": "ssap://tv/getCurrentChannel",
+    "description": "Get current TV channel"
+  },
+  {
+    "command": "ssap://tv/getChannelList",
+    "description": "Get channel list"
+  },
+  {
+    "command": "ssap://tv/openChannel",
+    "description": "Open channel. Payload depends on channel info"
+  },
+  {
+    "command": "ssap://tv/channelUp",
+    "description": "Channel up"
+  },
+  {
+    "command": "ssap://tv/channelDown",
+    "description": "Channel down"
+  },
+  {
+    "command": "ssap://com.webos.applicationManager/listApps",
+    "description": "List installed apps"
+  },
+  {
+    "command": "ssap://com.webos.applicationManager/getForegroundAppInfo",
+    "description": "Get foreground app info"
+  },
+  {
+    "command": "ssap://system.launcher/launch",
+    "description": "Launch app. Payload: {\"id\":\"youtube.leanback.v4\"}"
+  },
+  {
+    "command": "ssap://system.launcher/open",
+    "description": "Open content/URL. Payload depends on target app"
+  },
+  {
+    "command": "ssap://system.launcher/close",
+    "description": "Close app. Payload: {\"id\":\"appId\"}"
+  },
+  {
+    "command": "ssap://system.notifications/createToast",
+    "description": "Show toast. Payload: {\"message\":\"Hello\"}"
+  },
+  {
+    "command": "ssap://com.webos.service.tvpower/power/turnOffScreen",
+    "description": "Turn screen off"
+  },
+  {
+    "command": "ssap://com.webos.service.tvpower/power/turnOnScreen",
+    "description": "Turn screen on"
+  },
+  {
+    "command": "ssap://system/turnOff",
+    "description": "Turn TV off"
+  },
+  {
+    "command": "ssap://system/turnOn",
+    "description": "Turn TV on, if supported"
+  },
+  {
+    "command": "ssap://com.webos.service.networkinput/getPointerInputSocket",
+    "description": "Get remote pointer socket"
+  },
+  {
+    "command": "ssap://settings/getSystemSettings",
+    "description": "Get settings. Payload depends on category/keys"
+  },
+  {
+    "command": "ssap://settings/setSystemSettings",
+    "description": "Set settings. Payload depends on category/settings"
+  },
+  {
+    "command": "ssap://com.webos.service.update/getCurrentSWInformation",
+    "description": "Get current software information"
+  },
+  {
+    "command": "ssap://com.webos.service.connectionmanager/getStatus",
+    "description": "Get network connection status"
+  },
+  {
+    "command": "ssap://com.webos.service.secondscreen.gateway/getDeviceInfo",
+    "description": "Get device information"
+  }
+]

@@ -1,0 +1,210 @@
+[
+  {
+    "command": "ssap://api/getServiceList",
+    "description": "List available SSAP services/endpoints exposed by the TV"
+  },
+  {
+    "command": "ssap://audio/getStatus",
+    "description": "Get full audio status, including volume and mute when supported"
+  },
+  {
+    "command": "ssap://audio/getVolume",
+    "description": "Get current volume"
+  },
+  {
+    "command": "ssap://audio/setVolume",
+    "description": "Set volume. Payload: {\"volume\":10}"
+  },
+  {
+    "command": "ssap://audio/volumeUp",
+    "description": "Volume up"
+  },
+  {
+    "command": "ssap://audio/volumeDown",
+    "description": "Volume down"
+  },
+  {
+    "command": "ssap://audio/getMute",
+    "description": "Get mute status"
+  },
+  {
+    "command": "ssap://audio/setMute",
+    "description": "Set mute. Payload: {\"mute\":true}"
+  },
+  {
+    "command": "ssap://audio/getSoundOutput",
+    "description": "Get current sound output, if supported by this webOS version"
+  },
+  {
+    "command": "ssap://audio/changeSoundOutput",
+    "description": "Change sound output. Payload depends on output type/device"
+  },
+  {
+    "command": "ssap://com.webos.service.apiadapter/audio/getSoundOutput",
+    "description": "Get current sound output using API adapter endpoint"
+  },
+  {
+    "command": "ssap://com.webos.service.apiadapter/audio/changeSoundOutput",
+    "description": "Change sound output using API adapter endpoint. Payload depends on output device"
+  },
+  {
+    "command": "ssap://tv/getCurrentChannel",
+    "description": "Get current TV channel"
+  },
+  {
+    "command": "ssap://tv/getChannelList",
+    "description": "Get channel list"
+  },
+  {
+    "command": "ssap://tv/openChannel",
+    "description": "Open channel. Payload depends on channel info"
+  },
+  {
+    "command": "ssap://tv/channelUp",
+    "description": "Channel up"
+  },
+  {
+    "command": "ssap://tv/channelDown",
+    "description": "Channel down"
+  },
+  {
+    "command": "ssap://tv/getExternalInputList",
+    "description": "List external inputs such as HDMI/AV, if supported"
+  },
+  {
+    "command": "ssap://tv/switchInput",
+    "description": "Switch input. Payload example usually uses inputId from getExternalInputList"
+  },
+  {
+    "command": "ssap://tv/executeOneShot",
+    "description": "Take screenshot/one-shot capture when supported. Returns image URI on some models"
+  },
+  {
+    "command": "ssap://com.webos.applicationManager/listApps",
+    "description": "List installed apps"
+  },
+  {
+    "command": "ssap://com.webos.applicationManager/listLaunchPoints",
+    "description": "List launchable apps/launch points"
+  },
+  {
+    "command": "ssap://com.webos.applicationManager/getForegroundAppInfo",
+    "description": "Get foreground app info"
+  },
+  {
+    "command": "ssap://com.webos.applicationManager/launch",
+    "description": "Launch app using applicationManager. Payload: {\"id\":\"appId\"}"
+  },
+  {
+    "command": "ssap://com.webos.service.appstatus/getAppStatus",
+    "description": "Get app status. Payload: {\"appId\":\"appId\"}"
+  },
+  {
+    "command": "ssap://com.webos.media/getForegroundAppInfo",
+    "description": "Get foreground media app information"
+  },
+  {
+    "command": "ssap://system.launcher/launch",
+    "description": "Launch app. Payload: {\"id\":\"youtube.leanback.v4\"}"
+  },
+  {
+    "command": "ssap://system.launcher/open",
+    "description": "Open content/URL. Payload example: {\"target\":\"https://example.com\"}"
+  },
+  {
+    "command": "ssap://system.launcher/close",
+    "description": "Close app. Payload: {\"id\":\"appId\"}"
+  },
+  {
+    "command": "ssap://webapp/closeWebApp",
+    "description": "Close a web app. Payload depends on web app/session"
+  },
+  {
+    "command": "ssap://system.notifications/createToast",
+    "description": "Show toast. Payload: {\"message\":\"Hello\"}"
+  },
+  {
+    "command": "ssap://system/turnOff",
+    "description": "Turn TV off"
+  },
+  {
+    "command": "ssap://system/turnOn",
+    "description": "Turn TV on, if supported"
+  },
+  {
+    "command": "ssap://com.webos.service.tvpower/power/getPowerState",
+    "description": "Get or subscribe to power state. Payload optional: {\"subscribe\":true}"
+  },
+  {
+    "command": "ssap://com.webos.service.tvpower/power/turnOffScreen",
+    "description": "Turn screen off without fully powering off TV"
+  },
+  {
+    "command": "ssap://com.webos.service.tvpower/power/turnOnScreen",
+    "description": "Turn screen on"
+  },
+  {
+    "command": "ssap://com.webos.service.networkinput/getPointerInputSocket",
+    "description": "Get remote pointer socket"
+  },
+  {
+    "command": "ssap://com.webos.service.ime/insertText",
+    "description": "Insert text into focused input. Payload: {\"text\":\"hello\",\"replace\":0}"
+  },
+  {
+    "command": "ssap://com.webos.service.ime/sendEnterKey",
+    "description": "Send Enter/OK key to focused text input"
+  },
+  {
+    "command": "ssap://com.webos.service.ime/deleteCharacters",
+    "description": "Delete characters from focused input. Payload: {\"count\":1}"
+  },
+  {
+    "command": "ssap://media.controls/play",
+    "description": "Media play"
+  },
+  {
+    "command": "ssap://media.controls/pause",
+    "description": "Media pause"
+  },
+  {
+    "command": "ssap://media.controls/stop",
+    "description": "Media stop"
+  },
+  {
+    "command": "ssap://media.controls/rewind",
+    "description": "Media rewind"
+  },
+  {
+    "command": "ssap://media.controls/fastForward",
+    "description": "Media fast forward"
+  },
+  {
+    "command": "ssap://settings/getSystemSettings",
+    "description": "Get settings. Payload depends on category/keys"
+  },
+  {
+    "command": "ssap://settings/setSystemSettings",
+    "description": "Set settings. Payload depends on category/settings"
+  },
+  {
+    "command": "ssap://com.webos.service.update/getCurrentSWInformation",
+    "description": "Get current software information"
+  },
+  {
+    "command": "ssap://com.webos.service.connectionmanager/getStatus",
+    "description": "Get network connection status"
+  },
+  {
+    "command": "ssap://com.webos.service.secondscreen.gateway/getDeviceInfo",
+    "description": "Get device information"
+  },
+  {
+    "command": "ssap://com.webos.service.tv.display/set3DOn",
+    "description": "Enable 3D mode on models that support 3D"
+  },
+  {
+    "command": "ssap://com.webos.service.tv.display/set3DOff",
+    "description": "Disable 3D mode on models that support 3D"
+  }
+]

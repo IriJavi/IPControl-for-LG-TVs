@@ -1,0 +1,46 @@
+[
+  {
+    "id": "10.137.73.34",
+    "name": "CCR-01",
+    "ip": "10.137.73.34",
+    "mac": null,
+    "group": "CCR",
+    "notes": "",
+    "autoDiscovered": false,
+    "lastSeenAt": 1793713003492,
+    "online": false
+  },
+  {
+    "id": "10.137.73.55",
+    "name": "CCR-04",
+    "ip": "10.137.73.55",
+    "mac": null,
+    "group": "CCR",
+    "notes": "",
+    "autoDiscovered": false,
+    "lastSeenAt": 1793713003490,
+    "online": false
+  },
+  {
+    "id": "10.137.73.61",
+    "name": "CCR-02",
+    "ip": "10.137.73.61",
+    "mac": null,
+    "group": "CCR",
+    "notes": "",
+    "autoDiscovered": false,
+    "lastSeenAt": 1793713003491,
+    "online": false
+  },
+  {
+    "id": "10.137.73.6",
+    "name": "LG-TV-10-137-73-6",
+    "ip": "10.137.73.6",
+    "mac": null,
+    "group": "default",
+    "notes": "Added from automatic discovery",
+    "autoDiscovered": true,
+    "lastSeenAt": 1793710386318,
+    "online": false
+  }
+]
