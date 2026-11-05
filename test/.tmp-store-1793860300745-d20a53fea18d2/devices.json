@@ -1,0 +1,13 @@
+[
+  {
+    "id": "tv-01",
+    "name": "Living Room",
+    "ip": "10.0.0.20",
+    "mac": "aa:bb:cc:dd:ee:ff",
+    "group": "CCR",
+    "notes": "",
+    "autoDiscovered": false,
+    "lastSeenAt": 1793860300746,
+    "online": false
+  }
+]

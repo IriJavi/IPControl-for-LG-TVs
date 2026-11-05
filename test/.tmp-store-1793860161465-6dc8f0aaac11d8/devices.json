@@ -1,0 +1,13 @@
+[
+  {
+    "id": "tv-existing",
+    "name": "Existing Living Room",
+    "ip": "10.0.0.10",
+    "mac": "aa:bb:cc:dd:ee:ff",
+    "group": "default",
+    "notes": "",
+    "autoDiscovered": false,
+    "lastSeenAt": 1793860161466,
+    "online": false
+  }
+]

@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "scripts": {
     "start": "node server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "clean:keys": "node scripts/cleanup-temp-keys.js"
   },
   "dependencies": {
     "express": "^5.2.1",
-    "lgtv2": "^1.6.3"
+    "lgtv2": "^2.1.0"
   }
 }

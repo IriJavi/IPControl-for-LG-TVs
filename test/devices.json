@@ -1,0 +1,35 @@
+[
+  {
+    "id": "tv-mac-ip-alias",
+    "name": "MAC Alias TV",
+    "ip": "10.0.0.88",
+    "mac": "aa:bb:cc:dd:ee:ff",
+    "group": "default",
+    "notes": "",
+    "autoDiscovered": false,
+    "lastSeenAt": 1793861523650,
+    "online": false
+  },
+  {
+    "id": "tv-device-keepalive",
+    "name": "Bedroom",
+    "ip": "10.0.0.22",
+    "mac": "ee:ff:aa:bb:cc:dd",
+    "group": "default",
+    "notes": "",
+    "autoDiscovered": false,
+    "lastSeenAt": 1793861523646,
+    "online": false
+  },
+  {
+    "id": "tv-heartbeat",
+    "name": "Heartbeat TV",
+    "ip": "10.0.0.41",
+    "mac": "11:22:33:44:55:66",
+    "group": "default",
+    "notes": "",
+    "autoDiscovered": false,
+    "lastSeenAt": 1793861523732,
+    "online": false
+  }
+]

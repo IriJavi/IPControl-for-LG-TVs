@@ -14,7 +14,12 @@ class LGTVManager {
     this.statuses = new Map();
     this.keepAliveTimer = null;
     this.keepAliveActive = false;
-    this.keepAliveIntervalMs = 60 * 1000;
+    this.keepAliveIntervalMs = 5 * 60 * 1000;
+    this.keepAliveNextRunAt = null;
+    this.connectionHeartbeatTimer = null;
+    this.connectionHeartbeatMs = 30 * 1000;
+    this.deviceKeepAliveTimers = new Map();
+    this.deviceKeepAliveNextRunAt = new Map();
   }
 
   keyForDevice(device) {
@@ -22,8 +27,16 @@ class LGTVManager {
   }
 
   getKeyFilePath(device) {
-    const safeIp = String(device?.ip || device?.id || 'unknown').replace(/[^a-zA-Z0-9_.-]/g, '_');
-    return path.join(this.rootDir, `.lgtv-keys-temp-${safeIp}`);
+    const tempDir = path.join(this.rootDir, '.lgtv-keys-temp');
+    try {
+      fs.mkdirSync(tempDir, { recursive: true });
+    } catch (error) {
+      this.logger.warn(`[KEYFILE] Could not create the temporary keys folder: ${error?.message || String(error)}`);
+    }
+
+    const mac = device?.mac ? String(device.mac).trim().toLowerCase().replace(/[^a-f0-9]/g, '') : '';
+    const value = mac || String(device?.ip || device?.id || 'unknown').replace(/[^a-zA-Z0-9_.-]/g, '_');
+    return path.join(tempDir, `.${value}.key`);
   }
 
   getKeyCandidates(device) {
@@ -49,7 +62,7 @@ class LGTVManager {
     const keyFile = this.getKeyFilePath(device);
     try {
       const raw = fs.readFileSync(keyFile, 'utf8').trim();
-      if (raw && raw !== '{}' && raw.length > 10) return raw;
+      if (raw && raw !== '{}' && /^[a-f0-9]{16,}$/i.test(raw)) return raw;
     } catch (error) {
       // ignore missing temp key files when reconnecting; the key will be restored from the store
     }
@@ -59,7 +72,7 @@ class LGTVManager {
 
   persistKey(device, newKey, keyFile = this.getKeyFilePath(device)) {
     const keyValue = typeof newKey === 'string' ? newKey.trim() : '';
-    if (!keyValue || keyValue === '{}' || keyValue.length < 10) return null;
+    if (!keyValue || keyValue === '{}' || !/^[a-f0-9]{16,}$/i.test(keyValue)) return null;
 
     for (const candidate of this.getKeyCandidates(device)) {
       this.store.setKey(candidate, keyValue);
@@ -68,7 +81,7 @@ class LGTVManager {
     try {
       fs.writeFileSync(keyFile, keyValue, 'utf8');
     } catch (error) {
-      this.logger.warn(`[KEYFILE] No se pudo persistir la clave para ${device?.ip || device?.id || 'TV'}: ${error.message || String(error)}`);
+      this.logger.warn(`[KEYFILE] Could not persist the key for ${device?.ip || device?.id || 'TV'}: ${error.message || String(error)}`);
     }
 
     return keyValue;
@@ -80,6 +93,47 @@ class LGTVManager {
 
   getStatus(key) {
     return this.statuses.get(key) || { online: false, lastSeenAt: Date.now() };
+  }
+
+  shouldRetryPairingWithFreshKey(error) {
+    const text = String(error?.message || error?.code || error || '').toLowerCase();
+    return /(pair|unauthorized|auth|invalid.*key|client-key|not paired|not authorized|pairing|rejected|forbidden)/i.test(text);
+  }
+
+  clearSavedKeyForDevice(device) {
+    const dbDevice = this.store.normalizeDevice(device);
+    const keyCandidates = [dbDevice.mac, dbDevice.ip, dbDevice.id].filter(Boolean);
+
+    for (const candidate of keyCandidates) {
+      if (this.store.keys && Object.prototype.hasOwnProperty.call(this.store.keys, candidate)) {
+        delete this.store.keys[candidate];
+      }
+      if (this.store.inventory) {
+        for (const item of this.store.inventory) {
+          if ((item.mac && item.mac === candidate) || (item.ip && item.ip === candidate) || item.id === candidate) {
+            if (item.mac) delete this.store.keys[item.mac];
+            if (item.ip) delete this.store.keys[item.ip];
+          }
+        }
+      }
+    }
+
+    const keyFilePath = this.getKeyFilePath(dbDevice);
+    try {
+      if (fs.existsSync(keyFilePath)) {
+        fs.unlinkSync(keyFilePath);
+      }
+    } catch (error) {
+      this.logger.warn(`[PAIRING] Could not clear the temporary key for ${dbDevice.name || dbDevice.ip}: ${error?.message || String(error)}`);
+    }
+
+    try {
+      this.store.writeJson(this.store.keysPath, this.store.keys || {});
+    } catch (error) {
+      this.logger.warn(`[PAIRING] Could not save the key state after clearing ${dbDevice.name || dbDevice.ip}: ${error?.message || String(error)}`);
+    }
+
+    return true;
   }
 
   setStatus(device, extra = {}) {
@@ -104,7 +158,7 @@ class LGTVManager {
   async connectDevice(device) {
     const dbDevice = this.store.normalizeDevice(device);
     if (!dbDevice.ip) {
-      throw new Error('No hay IP para conectar la TV');
+      throw new Error('No IP available to connect the TV');
     }
 
     const key = this.keyForDevice(dbDevice);
@@ -119,7 +173,7 @@ class LGTVManager {
     } else {
       try {
         const fileKey = fs.readFileSync(keyFile, 'utf8').trim();
-        if (fileKey && fileKey !== '{}' && fileKey.length > 10) {
+        if (fileKey && fileKey !== '{}' && /^[a-f0-9]{16,}$/i.test(fileKey)) {
           this.persistKey(dbDevice, fileKey, keyFile);
         }
       } catch (error) {
@@ -131,10 +185,16 @@ class LGTVManager {
       url: `wss://${dbDevice.ip}:3001`,
       keyFile,
       clientKey: savedKey || undefined,
-      rejectUnauthorized: false,
+      verifyCert: false,
       reconnect: 5000,
       keepalive: true,
       timeout: 15000,
+      wsconfig: {
+        keepalive: true,
+        keepaliveInterval: 10000,
+        dropConnectionOnKeepaliveTimeout: true,
+        keepaliveGracePeriod: 5000,
+      },
       saveKey: (newKey) => {
         if (!newKey) return null;
         const finalKey = String(newKey).trim();
@@ -160,11 +220,11 @@ class LGTVManager {
         keySaved: !!(current.mac ? this.store.getKey(current.mac) : this.store.getKey(current.ip)),
         lastSeenAt: Date.now(),
       });
-      this.logger.log(`[OK] ${current.name} conectada en ${current.ip}`);
+      this.logger.log(`[OK] ${current.name} connected at ${current.ip}`);
     });
 
     tv.on('prompt', () => {
-      this.logger.warn(`[PROMPT] ${dbDevice.name} en ${dbDevice.ip}: acepta la petición en la TV`);
+      this.logger.warn(`[PROMPT] ${dbDevice.name} at ${dbDevice.ip}: accept the request on the TV`);
       this.setStatus(dbDevice, { online: false, promptRequired: true, lastSeenAt: Date.now() });
       const keyValue = tv.clientKey || this.resolveSavedKey(dbDevice);
       if (keyValue) {
@@ -173,12 +233,26 @@ class LGTVManager {
     });
 
     tv.on('error', (error) => {
-      this.logger.warn(`[ERROR] ${dbDevice.name} (${dbDevice.ip}): ${error?.message || String(error)}`);
+      const message = error?.message || String(error);
+      this.logger.warn(`[ERROR] ${dbDevice.name} (${dbDevice.ip}): ${message}`);
+
+      if (this.shouldRetryPairingWithFreshKey(error)) {
+        this.logger.warn(`[PAIRING] Retrying pairing without a saved key for ${dbDevice.name} (${dbDevice.ip})`);
+        this.clearSavedKeyForDevice(dbDevice);
+        if (this.clients.get(key) === tv) this.clients.delete(key);
+        setTimeout(() => {
+          this.ensureConnected(dbDevice).catch((retryError) => {
+            this.logger.warn(`[PAIRING] Retry failed for ${dbDevice.name} (${dbDevice.ip}): ${retryError?.message || String(retryError)}`);
+          });
+        }, 1500);
+        return;
+      }
+
       this.setStatus(dbDevice, { online: false, lastSeenAt: Date.now() });
     });
 
     tv.on('close', () => {
-      this.logger.warn(`[CLOSE] ${dbDevice.name} (${dbDevice.ip}) cerrada`);
+      this.logger.warn(`[CLOSE] ${dbDevice.name} (${dbDevice.ip}) closed`);
       this.setStatus(dbDevice, { online: false, lastSeenAt: Date.now() });
     });
 
@@ -203,7 +277,7 @@ class LGTVManager {
       try {
         client.connect(`wss://${dbDevice.ip}:3001`);
       } catch (error) {
-        this.logger.warn(`[RETRY] No se pudo reconnectar ${dbDevice.ip}: ${error?.message || String(error)}`);
+        this.logger.warn(`[RETRY] Could not reconnect ${dbDevice.ip}: ${error?.message || String(error)}`);
       }
     }
     return client;
@@ -212,7 +286,7 @@ class LGTVManager {
   async executeCommand(device, command, payload) {
     const dbDevice = this.store.normalizeDevice(device);
     if (!dbDevice.ip) {
-      return { status: 'error', message: 'No hay IP para este dispositivo' };
+      return { status: 'error', message: 'No IP available for this device' };
     }
 
     const client = await this.ensureConnected(dbDevice);
@@ -220,7 +294,7 @@ class LGTVManager {
 
     if (!client || !connectedNow) {
       this.setStatus(dbDevice, { online: false, lastSeenAt: Date.now() });
-      return { status: 'error', name: dbDevice.name, ip: dbDevice.ip, message: 'La TV no está conectada' };
+      return { status: 'error', name: dbDevice.name, ip: dbDevice.ip, message: 'The TV is not connected' };
     }
 
     try {
@@ -242,7 +316,7 @@ class LGTVManager {
     const targetUrl = url || 'https://6b10-mes.mobis.com/dashboard.do';
 
     if (!dbDevice.ip) {
-      return { status: 'error', message: 'No hay IP para este dispositivo' };
+      return { status: 'error', message: 'No IP available for this device' };
     }
 
     const client = await this.ensureConnected(dbDevice);
@@ -250,7 +324,7 @@ class LGTVManager {
 
     if (!client || !connectedNow) {
       this.setStatus(dbDevice, { online: false, lastSeenAt: Date.now() });
-      return { status: 'error', name: dbDevice.name, ip: dbDevice.ip, message: 'La TV no está conectada' };
+      return { status: 'error', name: dbDevice.name, ip: dbDevice.ip, message: 'The TV is not connected' };
     }
 
     try {
@@ -288,21 +362,117 @@ class LGTVManager {
     });
   }
 
+  async sendVolumeKeepAlive(device, source = 'KEEPALIVE') {
+    const dbDevice = this.store.normalizeDevice(device);
+    if (!dbDevice.ip) {
+      return { status: 'error', message: 'No IP available for this device' };
+    }
+
+    try {
+      await this.executeCommand(dbDevice, 'ssap://audio/volumeDown');
+    } catch (error) {
+      this.logger.warn(`[KEEPALIVE] ${source} | ${dbDevice.name}: ${error?.message || String(error)}`);
+    }
+
+    let client;
+    try {
+      client = await this.ensureConnected(dbDevice);
+    } catch (error) {
+      this.logger.warn(`[KEEPALIVE] ${source} | ${dbDevice.name}: ${error?.message || String(error)}`);
+      return { status: 'error', message: error?.message || String(error) };
+    }
+
+    const connectedNow = !!(client && (client.connection === true || client.connection?.connected === true));
+    if (!connectedNow || typeof client.getSocket !== 'function') {
+      return { status: 'skipped', name: dbDevice.name, ip: dbDevice.ip, message: 'No remote socket available' };
+    }
+
+    return new Promise((resolve) => {
+      client.getSocket('ssap://com.webos.service.networkinput/getPointerInputSocket', (error, socket) => {
+        if (error || !socket) {
+          const message = error?.message || 'Remote socket is empty';
+          this.logger.warn(`[KEEPALIVE] ${source} | ${dbDevice.name} (${dbDevice.ip}) | ERROR socket: ${message}`);
+          return resolve({ status: 'error', name: dbDevice.name, ip: dbDevice.ip, message });
+        }
+
+        try {
+          socket.send('move', { dx: 1, dy: 0, down: 0 });
+          setTimeout(() => {
+            try {
+              socket.send('button', { name: 'VOLUMEDOWN' });
+            } catch (innerError) {
+              this.logger.warn(`[KEEPALIVE] ${source} | ${dbDevice.name} (${dbDevice.ip}) | ERROR VOLUMEDOWN: ${innerError?.message || String(innerError)}`);
+            }
+          }, 150);
+          resolve({ status: 'ok', name: dbDevice.name, ip: dbDevice.ip });
+        } catch (innerError) {
+          this.logger.warn(`[KEEPALIVE] ${source} | ${dbDevice.name} (${dbDevice.ip}) | ERROR MOVE: ${innerError?.message || String(innerError)}`);
+          resolve({ status: 'error', name: dbDevice.name, ip: dbDevice.ip, message: innerError?.message || String(innerError) });
+        }
+      });
+    });
+  }
+
+  startConnectionHeartbeat() {
+    if (this.connectionHeartbeatTimer) return { status: 'ok', active: true };
+
+    const tick = async () => {
+      const devices = this.store.listDevices();
+      for (const device of devices) {
+        try {
+          if (!device.ip) continue;
+          const client = await this.ensureConnected(device);
+          const connectedNow = !!(client && (client.connection === true || client.connection?.connected === true));
+          if (!client || !connectedNow) {
+            this.setStatus(device, { online: false, lastSeenAt: Date.now() });
+            continue;
+          }
+          const response = await client.request('ssap://audio/getVolume');
+          this.setStatus(device, {
+            online: true,
+            keySaved: !!(device.mac ? this.store.getKey(device.mac) : this.store.getKey(device.ip)),
+            lastSeenAt: Date.now(),
+            response: response || null,
+          });
+        } catch (error) {
+          this.setStatus(device, { online: false, lastSeenAt: Date.now(), error: error?.message || String(error) });
+        }
+      }
+    };
+
+    tick().catch(() => {});
+    this.connectionHeartbeatTimer = setInterval(() => {
+      tick().catch(() => {});
+    }, this.connectionHeartbeatMs);
+
+    return { status: 'ok', active: true, intervalMs: this.connectionHeartbeatMs };
+  }
+
+  stopConnectionHeartbeat() {
+    if (this.connectionHeartbeatTimer) {
+      clearInterval(this.connectionHeartbeatTimer);
+      this.connectionHeartbeatTimer = null;
+    }
+    return { status: 'ok', active: false };
+  }
+
   startKeepAlive() {
     if (this.keepAliveActive) return { status: 'ok', active: true };
 
     this.keepAliveActive = true;
+    this.keepAliveNextRunAt = Date.now() + this.keepAliveIntervalMs;
     const tick = async () => {
       const devices = this.store.listDevices();
       for (const device of devices) {
         try {
           if (device.ip) {
-            await this.executeCommand(device, 'ssap://audio/volumeDown');
+            await this.sendVolumeKeepAlive(device, 'MASTER');
           }
         } catch (error) {
-          this.logger.warn(`[KEEPALIVE] ${device.name}: ${error.message || String(error)}`);
+          this.logger.warn(`[KEEPALIVE] ${device.name}: ${error?.message || String(error)}`);
         }
       }
+      this.keepAliveNextRunAt = Date.now() + this.keepAliveIntervalMs;
     };
 
     tick();
@@ -313,8 +483,67 @@ class LGTVManager {
     return { status: 'ok', active: true };
   }
 
+  getDeviceKeepAliveState(device) {
+    const dbDevice = this.store.normalizeDevice(device);
+    const key = dbDevice.mac || dbDevice.ip || dbDevice.id || 'unknown';
+    const timer = this.deviceKeepAliveTimers.get(key);
+    const nextRunAt = this.deviceKeepAliveNextRunAt.get(key);
+    const active = !!timer;
+    const remainingMs = active && nextRunAt ? Math.max(0, nextRunAt - Date.now()) : 0;
+    return {
+      active,
+      intervalMs: this.keepAliveIntervalMs,
+      remainingMs,
+      nextRunAt: nextRunAt || null,
+    };
+  }
+
+  async startDeviceKeepAlive(device) {
+    const dbDevice = this.store.normalizeDevice(device);
+    const key = dbDevice.mac || dbDevice.ip || dbDevice.id || 'unknown';
+
+    if (this.deviceKeepAliveTimers.has(key)) {
+      return { status: 'ok', active: true, device: dbDevice.id, remainingMs: this.getDeviceKeepAliveState(dbDevice).remainingMs };
+    }
+
+    this.deviceKeepAliveNextRunAt.set(key, Date.now() + this.keepAliveIntervalMs);
+    const tick = async () => {
+      try {
+        if (dbDevice.ip) {
+          await this.sendVolumeKeepAlive(dbDevice, 'DEVICE');
+        }
+      } catch (error) {
+        this.logger.warn(`[KEEPALIVE] ${dbDevice.name}: ${error?.message || String(error)}`);
+      }
+      this.deviceKeepAliveNextRunAt.set(key, Date.now() + this.keepAliveIntervalMs);
+    };
+
+    await tick();
+    const timer = setInterval(() => {
+      tick().catch(() => {});
+    }, this.keepAliveIntervalMs);
+    this.deviceKeepAliveTimers.set(key, timer);
+
+    return { status: 'ok', active: true, device: dbDevice.id, remainingMs: this.keepAliveIntervalMs };
+  }
+
+  stopDeviceKeepAlive(device) {
+    const dbDevice = this.store.normalizeDevice(device);
+    const key = dbDevice.mac || dbDevice.ip || dbDevice.id || 'unknown';
+    const timer = this.deviceKeepAliveTimers.get(key);
+
+    if (timer) {
+      clearInterval(timer);
+      this.deviceKeepAliveTimers.delete(key);
+    }
+    this.deviceKeepAliveNextRunAt.delete(key);
+
+    return { status: 'ok', active: false, device: dbDevice.id, remainingMs: 0 };
+  }
+
   stopKeepAlive() {
     this.keepAliveActive = false;
+    this.keepAliveNextRunAt = null;
     if (this.keepAliveTimer) {
       clearInterval(this.keepAliveTimer);
       this.keepAliveTimer = null;

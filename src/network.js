@@ -107,7 +107,7 @@ function parseArpTable(raw) {
     if (!trimmed || trimmed.startsWith('Interface') || trimmed.startsWith('Internet')) continue;
 
     const ipMatch = trimmed.match(/(\d{1,3}(?:\.\d{1,3}){3})/);
-    const macMatch = trimmed.match(/([0-9A-Fa-f]{2}(?::[0-9A-Fa-f]{2}){5})/);
+    const macMatch = trimmed.match(/([0-9A-Fa-f]{2}(?:[:-][0-9A-Fa-f]{2}){5})/);
     if (ipMatch && macMatch) {
       const ip = ipMatch[1];
       const mac = normalizeMac(macMatch[1]);
@@ -194,6 +194,7 @@ async function discoverLGTVs({ timeoutMs = 120, cidr, startIp, endIp } = {}) {
 
 module.exports = {
   normalizeMac,
+  parseArpTable,
   readArpTable,
   getLocalNetworks,
   generateIpsFromCidr,

@@ -121,6 +121,37 @@
     .warning { background: linear-gradient(180deg, #f6efd9 0%, #ebddad 100%); color: #7c6320; }
     .danger { background: linear-gradient(180deg, #f5e0e2 0%, #e8c7ca 100%); color: var(--red); }
 
+    input, select, textarea {
+      width: 100%;
+      border: 2px solid var(--line);
+      background: #fff;
+      padding: 9px 10px;
+      font: inherit;
+      color: var(--text);
+      border-radius: 8px;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease;
+      cursor: text;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(90, 126, 168, 0.16);
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    ::selection {
+      background: rgba(90, 126, 168, 0.2);
+    }
+
     .stats {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -177,6 +208,76 @@
       color: var(--dark);
     }
 
+    .overview-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+
+    .filter-menu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      width: min(270px, 80vw);
+      background: var(--panel);
+      border: 2px solid var(--line-strong);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.12);
+      padding: 10px;
+      z-index: 12;
+    }
+
+    .filter-menu-header {
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .filter-reset {
+      width: 100%;
+      margin-top: 8px;
+      padding: 7px 8px;
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      padding: 6px 2px;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .filter-option input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: var(--blue);
+      cursor: pointer;
+    }
+
+    .group-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line-strong);
+      background: var(--blue-soft);
+      color: var(--dark);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
     .search {
       display: flex;
       gap: 8px;
@@ -204,8 +305,34 @@
     .overview-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 14px;
       margin-top: 16px;
+    }
+
+    .overview-group {
+      border: 2px solid var(--line);
+      background: linear-gradient(180deg, #f8fafc 0%, #edf3f8 100%);
+      padding: 10px;
+    }
+
+    .overview-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--dark);
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .overview-group-items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
     .overview-item {
@@ -216,6 +343,7 @@
       border: 2px solid var(--line);
       background: linear-gradient(180deg, #f9fbfd 0%, #edf3f8 100%);
       padding: 10px 12px;
+      cursor: pointer;
     }
 
     .overview-item-main {
@@ -360,6 +488,92 @@
       font-size: 0.76rem;
       color: var(--muted);
       margin-top: 4px;
+    }
+
+    .device-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border: 2px solid var(--line);
+      background: linear-gradient(180deg, #f9fbfd 0%, #edf3f8 100%);
+      padding: 12px;
+      border-radius: 10px;
+    }
+
+    .touchpad-surface {
+      width: 100%;
+      height: 270px;
+      border: 2px solid var(--line-strong);
+      background:
+        radial-gradient(circle at center, rgba(90,126,168,0.15) 0%, rgba(90,126,168,0.04) 28%, rgba(255,255,255,0.7) 30%, rgba(230,236,242,0.9) 100%),
+        linear-gradient(180deg, #f9fafb 0%, #e8eef5 100%);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 700;
+      user-select: none;
+      touch-action: none;
+      cursor: crosshair;
+      box-shadow: inset 0 0 0 1px rgba(90,126,168,0.08);
+    }
+
+    .touchpad-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .touchpad-meta {
+      margin: 0 0 10px;
+      font-size: 0.76rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .device-main {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .status-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .key-value {
+      display: block;
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid var(--line);
+      background: rgba(255,255,255,0.7);
+      border-radius: 8px;
+      color: var(--dark);
+      font-family: Consolas, monospace;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-all;
+      overflow-wrap: anywhere;
+    }
+
+    .field label {
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
     }
 
     .device-actions {
@@ -577,6 +791,18 @@
       border: 2px solid var(--line-strong);
       box-shadow: 0 16px 32px rgba(0,0,0,0.2);
       padding: 18px;
+      border-radius: 12px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 2px solid var(--line);
+      padding: 6px 8px;
+      font-size: 0.76rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.45);
     }
 
     @media (max-width: 980px) {
@@ -597,7 +823,6 @@
         </div>
       </div>
       <div class="top-actions">
-        <button class="primary" id="discoverBtn">Discover</button>
         <button class="success" id="keepAliveToggleBtn">KeepAlive OFF</button>
         <button class="warning" id="volumeAllBtn">Lower all</button>
         <button id="refreshBtn">Refresh</button>
@@ -626,7 +851,7 @@
     <div class="content">
       <aside class="panel">
         <div class="panel-title">
-          <span>Inventory</span>
+          <span>Scanner</span>
         </div>
 
         <div class="search">
@@ -668,18 +893,9 @@
             </div>
 
             <div class="quick-card">
-              <h3>Volume</h3>
-              <div class="quick-actions">
-                <button class="warning" id="volumeDownBtn">Down</button>
-                <button id="volumeUpBtn">Up</button>
-              </div>
-            </div>
-
-            <div class="quick-card">
-              <h3>Launcher</h3>
+              <h3>Touchpad</h3>
               <div class="quick-actions">
                 <button class="primary" id="dashboardBtn">Open</button>
-                <button id="reloadBtn">Reload</button>
               </div>
             </div>
 
@@ -693,7 +909,16 @@
           </div>
 
           <div class="panel-title" style="margin-top: 18px;">
-            <span>Pool</span>
+            <span>Groups</span>
+            <div class="overview-controls">
+              <button id="clearSelectionBtn" class="ghost">Clear selection</button>
+              <button id="groupFilterBtn" class="ghost" type="button" aria-label="Filter overview">☰</button>
+              <div id="groupFilterMenu" class="filter-menu" hidden>
+                <div class="filter-menu-header">Visible groups</div>
+                <div id="groupFilterList"></div>
+                <button type="button" class="filter-reset" id="groupFilterResetBtn">Show all</button>
+              </div>
+            </div>
           </div>
           <div class="overview-list" id="overviewDeviceList"></div>
         </section>
@@ -701,7 +926,6 @@
         <section class="tab-pane" data-pane="devices">
           <div class="panel-title">
             <span>TV status</span>
-            <button class="primary" id="configOpenBtn">Config</button>
           </div>
           <div class="grid-cards" id="deviceGrid"></div>
         </section>
@@ -728,6 +952,32 @@ ssap://audio/volumeDown</div>
   </div>
 
   <div class="toast" id="toast"></div>
+
+  <div id="keysDetailModal" class="modal" hidden>
+    <div class="modal-panel" style="width:min(900px,100%);">
+      <div class="panel-title">
+        <span>Assigned keys status</span>
+        <button id="closeKeysDetailModalBtn" class="ghost">Close</button>
+      </div>
+      <div class="device-list" id="keysDetailList" style="max-height: 62vh; overflow:auto; margin-top: 12px;"></div>
+    </div>
+  </div>
+
+  <div id="mouseTouchpadModal" class="modal" hidden>
+    <div class="modal-panel" style="width:min(620px,100%);">
+      <div class="panel-title">
+        <span>Touchpad</span>
+        <button id="closeMouseTouchpadModalBtn" class="ghost">Close</button>
+      </div>
+      <div class="touchpad-meta">Targets: <span id="touchpadTargetCount">0</span></div>
+      <div id="touchpadSurface" class="touchpad-surface">Move cursor</div>
+      <div class="touchpad-actions">
+        <button class="primary" id="touchpadClickBtn">Click</button>
+        <button id="touchpadBackBtn">Back</button>
+        <button id="touchpadOpenBtn">Open dashboard</button>
+      </div>
+    </div>
+  </div>
 
   <div id="deviceConfigModal" class="modal" hidden>
     <div class="modal-panel">
@@ -772,8 +1022,11 @@ ssap://audio/volumeDown</div>
       selectedId: null,
       selectedIds: [],
       keepAlive: false,
-      filter: 'all',
+      keepAliveIntervalMs: 300000,
+      keepAliveCountdownMs: 300000,
       search: '',
+      groupFilterSort: 'group',
+      hiddenGroups: {},
       logs: [],
       scanResults: [],
       scanning: false,
@@ -919,6 +1172,14 @@ ssap://audio/volumeDown</div>
     }
 
     function fillForm(device) {
+      const modal = $('deviceConfigModal');
+      const modalIsOpen = modal && !modal.hidden;
+      const focusInsideModal = modalIsOpen && modal.contains(document.activeElement);
+
+      if (modalIsOpen && focusInsideModal) {
+        return;
+      }
+
       $('deviceName').value = device?.name || '';
       $('deviceIp').value = device?.ip || '';
       $('deviceMac').value = device?.mac || '';
@@ -926,14 +1187,9 @@ ssap://audio/volumeDown</div>
       $('deviceNotes').value = device?.notes || '';
     }
 
-    function clearForm() {
+    function clearSelection() {
       state.selectedId = null;
       state.selectedIds = [];
-      $('deviceName').value = '';
-      $('deviceIp').value = '';
-      $('deviceMac').value = '';
-      $('deviceGroup').value = 'default';
-      $('deviceNotes').value = '';
       $('globalStatus').textContent = 'No selection';
       $('globalDot').className = 'dot offline';
       renderSidebar();
@@ -941,21 +1197,76 @@ ssap://audio/volumeDown</div>
       renderOverviewList();
     }
 
-    function filteredDevices() {
-      return state.devices.filter((device) => {
-        const matchesGroup = state.filter === 'all' || (device.group || 'default') === state.filter;
-        const text = `${device.name || ''} ${device.ip || ''} ${device.mac || ''}`.toLowerCase();
-        const matchesSearch = !state.search || text.includes(state.search.toLowerCase());
-        return matchesGroup && matchesSearch;
-      });
+    function clearForm() {
+      clearSelection();
+      $('deviceName').value = '';
+      $('deviceIp').value = '';
+      $('deviceMac').value = '';
+      $('deviceGroup').value = 'default';
+      $('deviceNotes').value = '';
     }
 
-    function renderGroupOptions() {
-      const select = $('groupFilter');
-      if (!select) return;
-      const groups = [...new Set(state.devices.map((device) => device.group || 'default'))].sort();
-      select.innerHTML = '<option value="all">All groups</option>' + groups.map((group) => `<option value="${group}">${group}</option>`).join('');
-      select.value = state.filter;
+    function normalizeGroupName(device) {
+      const group = (device && (device.group || 'default')) || 'default';
+      return String(group).trim() || 'default';
+    }
+
+    function getSortedDevices(items) {
+      const sorted = [...items];
+      sorted.sort((a, b) => {
+        const groupA = normalizeGroupName(a);
+        const groupB = normalizeGroupName(b);
+        return groupA.localeCompare(groupB) || (a.name || '').localeCompare(b.name || '') || (a.ip || '').localeCompare(b.ip || '');
+      });
+      return sorted;
+    }
+
+    function getDeviceGroups() {
+      const groups = state.devices.map((device) => normalizeGroupName(device));
+      return Array.from(new Set(groups)).sort((a, b) => a.localeCompare(b));
+    }
+
+    function renderGroupFilterMenu() {
+      const list = $('groupFilterList');
+      if (!list) return;
+      const groups = getDeviceGroups();
+      if (!groups.length) {
+        list.innerHTML = '<div class="device-meta">No groups available.</div>';
+        return;
+      }
+      list.innerHTML = groups.map((group) => {
+        const checked = !state.hiddenGroups[group];
+        return `
+          <label class="filter-option">
+            <input type="checkbox" data-group-toggle="${group}" ${checked ? 'checked' : ''} />
+            <span>${group}</span>
+          </label>
+        `;
+      }).join('');
+
+      list.querySelectorAll('[data-group-toggle]').forEach((input) => {
+        input.addEventListener('change', (event) => {
+          const group = event.target.dataset.groupToggle;
+          if (event.target.checked) {
+            delete state.hiddenGroups[group];
+          } else {
+            state.hiddenGroups[group] = true;
+          }
+          renderCards();
+          renderOverviewList();
+        });
+      });
+
+    }
+
+    function filteredDevices() {
+      const query = (state.search || '').trim().toLowerCase();
+      return getSortedDevices(state.devices.filter((device) => {
+        const group = normalizeGroupName(device);
+        if (state.hiddenGroups[group]) return false;
+        const text = `${device.name || ''} ${device.ip || ''} ${device.mac || ''} ${group}`.toLowerCase();
+        return !query || text.includes(query);
+      }));
     }
 
     function renderScanResults() {
@@ -1045,38 +1356,74 @@ ssap://audio/volumeDown</div>
 
     }
 
+    function formatOnlineStatus(online) {
+      const status = online ? 'Online' : 'Offline';
+      return `
+        <span class="status-inline">
+          <span class="dot ${online ? 'online' : 'offline'}"></span>
+          <span>${status}</span>
+        </span>
+      `;
+    }
+
     function renderOverviewList() {
       const list = $('overviewDeviceList');
-      const items = state.devices || [];
+      const items = filteredDevices();
       list.innerHTML = '';
 
       if (!items.length) {
-        list.innerHTML = '<div class="device-meta">No TVs in the pool yet.</div>';
+        list.innerHTML = '<div class="device-meta">No TVs in the current group filter.</div>';
         return;
       }
 
+      const grouped = new Map();
       for (const device of items) {
-        const isSelected = state.selectedIds.includes(device.id);
-        const row = document.createElement('div');
-        row.className = 'overview-item' + (isSelected ? ' selected' : '');
-        row.innerHTML = `
-          <div class="overview-item-main">
-            <div class="overview-item-name">${device.name || 'LG TV'}</div>
-            <div class="overview-item-meta">${device.ip || 'No IP'} · ${device.online ? 'Online' : 'Offline'}</div>
-          </div>
-          <div style="display:flex;gap:6px;align-items:center;">
-            <button class="${isSelected ? 'primary' : ''}" data-overview-select="${device.id}">${isSelected ? 'Selected' : 'Select'}</button>
-            <button class="danger" data-remove-device="${device.id}">Remove</button>
-          </div>
-        `;
-        list.appendChild(row);
+        const groupName = normalizeGroupName(device);
+        if (!grouped.has(groupName)) grouped.set(groupName, []);
+        grouped.get(groupName).push(device);
       }
 
-      list.querySelectorAll('[data-overview-select]').forEach((button) => {
-        button.addEventListener('click', () => {
-          toggleDeviceSelection(button.dataset.overviewSelect);
-        });
-      });
+      const orderedGroups = Array.from(grouped.keys()).sort((a, b) => a.localeCompare(b));
+
+      for (const groupName of orderedGroups) {
+        const groupWrap = document.createElement('div');
+        groupWrap.className = 'overview-group';
+
+        const header = document.createElement('div');
+        header.className = 'overview-group-header';
+        header.innerHTML = `
+          <span class="group-badge">${groupName}</span>
+          <span>${grouped.get(groupName).length}</span>
+        `;
+        groupWrap.appendChild(header);
+
+        const groupList = document.createElement('div');
+        groupList.className = 'overview-group-items';
+
+        for (const device of grouped.get(groupName)) {
+          const isSelected = state.selectedIds.includes(device.id);
+          const row = document.createElement('div');
+          row.className = 'overview-item' + (isSelected ? ' selected' : '');
+          row.dataset.deviceId = device.id;
+          row.innerHTML = `
+            <div class="overview-item-main">
+              <div class="overview-item-name">${device.name || 'LG TV'}</div>
+              <div class="overview-item-meta">${device.ip || 'No IP'} · ${formatOnlineStatus(device.online)}</div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button class="danger" data-remove-device="${device.id}">Remove</button>
+            </div>
+          `;
+          row.addEventListener('click', (event) => {
+            if (event.target.closest('[data-remove-device]')) return;
+            toggleDeviceSelection(device.id);
+          });
+          groupList.appendChild(row);
+        }
+
+        groupWrap.appendChild(groupList);
+        list.appendChild(groupWrap);
+      }
 
       list.querySelectorAll('[data-remove-device]').forEach((button) => {
         button.addEventListener('click', async (event) => {
@@ -1116,34 +1463,33 @@ ssap://audio/volumeDown</div>
       }
 
       for (const device of items) {
-        const isSelected = state.selectedIds.includes(device.id) || device.id === state.selectedId;
+        const keepAliveActive = !!device.keepAliveActive;
+        const keepAliveText = keepAliveActive
+          ? `KeepAlive ${formatKeepAliveTimer(device.keepAliveRemainingMs || 300000)}`
+          : 'KeepAlive';
         const card = document.createElement('div');
-        card.className = 'tv-card' + (isSelected ? ' selected' : '');
+        const groupName = normalizeGroupName(device);
+        card.className = 'tv-card';
         card.innerHTML = `
           <div class="tv-header">
             <div class="tv-name">${device.name}</div>
-            <span class="state-pill ${device.online ? 'online' : 'offline'}">${device.online ? 'Online' : 'Offline'}</span>
+            <span class="state-pill ${device.online ? 'online' : 'offline'}">
+              <span class="dot ${device.online ? 'online' : 'offline'}"></span>
+              ${device.online ? 'Online' : 'Offline'}
+            </span>
           </div>
           <div class="tv-meta">IP: ${device.ip || 'N/A'}</div>
           <div class="tv-meta">MAC: ${device.mac || 'N/A'}</div>
-          <div class="tv-meta">Group: ${device.group || 'default'}</div>
+          <div class="tv-meta">Group: <span class="group-badge">${groupName}</span></div>
           <div class="tv-meta">Key: ${device.keySaved ? 'Saved' : 'Missing'}</div>
           <div class="tv-meta">Last seen: ${device.lastSeenAt ? new Date(device.lastSeenAt).toLocaleString() : 'Never'}</div>
           <div class="tiny-actions">
-            <button class="${isSelected ? 'primary' : ''}" data-card-select="${device.id}">${isSelected ? 'Selected' : 'Select'}</button>
-            <button data-command="ssap://audio/getVolume" data-id="${device.id}">Volume</button>
-            <button class="warning" data-command="ssap://audio/volumeDown" data-id="${device.id}">Lower</button>
+            <button class="${keepAliveActive ? 'success' : 'primary'}" data-device-keepalive="${device.id}" data-device-keepalive-active="${keepAliveActive}">${keepAliveText}</button>
             <button data-config-device="${device.id}">Config</button>
           </div>
         `;
         grid.appendChild(card);
       }
-
-      grid.querySelectorAll('[data-card-select]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          toggleDeviceSelection(btn.dataset.cardSelect);
-        });
-      });
 
       grid.querySelectorAll('[data-config-device]').forEach((btn) => {
         btn.addEventListener('click', () => {
@@ -1151,28 +1497,50 @@ ssap://audio/volumeDown</div>
         });
       });
 
-      grid.querySelectorAll('[data-command]').forEach((btn) => {
+      grid.querySelectorAll('[data-device-keepalive]').forEach((btn) => {
         btn.addEventListener('click', async () => {
-          const result = await api(`/api/devices/${btn.dataset.id}/command`, 'POST', { command: btn.dataset.command });
-          appendLog(`${btn.dataset.command} -> ${result.status || 'error'}`);
-          showToast(result.status === 'ok' ? 'Command sent' : result.message || 'Error');
-          await loadDevices();
+          const deviceId = btn.dataset.deviceKeepalive;
+          const isActive = btn.dataset.deviceKeepaliveActive === 'true';
+          const result = await api(`/api/devices/${deviceId}/keepalive`, 'POST', { active: !isActive });
+          if (result.status === 'ok') {
+            await loadDevices();
+            showToast(result.active ? 'KeepAlive active' : 'KeepAlive stopped');
+          } else {
+            showToast(result.message || 'Error');
+          }
         });
       });
+    }
+
+    function formatKeepAliveLabel() {
+      if (!state.keepAlive) return 'OFF';
+      const remaining = Math.max(0, state.keepAliveCountdownMs || 0);
+      const totalSeconds = Math.ceil(remaining / 1000);
+      const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+      const seconds = String(totalSeconds % 60).padStart(2, '0');
+      return `ON ${minutes}:${seconds}`;
+    }
+
+    function formatKeepAliveTimer(ms) {
+      const remaining = Math.max(0, Number(ms || 0));
+      const totalSeconds = Math.ceil(remaining / 1000);
+      const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+      const seconds = String(totalSeconds % 60).padStart(2, '0');
+      return `${minutes}:${seconds}`;
     }
 
     function updateStats() {
       $('statTotal').textContent = state.devices.length;
       $('statOnline').textContent = state.devices.filter((device) => device.online).length;
       $('statMissingKey').textContent = state.devices.filter((device) => !device.keySaved).length;
-      $('statKeepAlive').textContent = state.keepAlive ? 'ON' : 'OFF';
+      $('statKeepAlive').textContent = formatKeepAliveLabel();
     }
 
     async function loadDevices() {
       const data = await api('/api/devices');
       state.devices = Array.isArray(data) ? data : Object.values(data || {});
       updateStats();
-      renderGroupOptions();
+      renderGroupFilterMenu();
       renderSidebar();
       renderCards();
       renderOverviewList();
@@ -1190,38 +1558,31 @@ ssap://audio/volumeDown</div>
     async function loadKeepAliveState() {
       const data = await api('/api/volume/status');
       state.keepAlive = !!data.active;
+      state.keepAliveIntervalMs = Number(data.intervalMs || 300000);
+      state.keepAliveCountdownMs = state.keepAlive ? Math.max(0, Number(data.remainingMs || state.keepAliveIntervalMs)) : 0;
       const button = $('keepAliveToggleBtn');
-      button.textContent = state.keepAlive ? 'KeepAlive ON' : 'KeepAlive OFF';
+      button.textContent = state.keepAlive ? `KeepAlive ${formatKeepAliveLabel()}` : 'KeepAlive OFF';
       button.className = state.keepAlive ? 'success' : 'ghost';
       updateStats();
     }
 
-    $('networkRangeInput').value = '10.137.73.0/24';
-
-    $('discoverBtn').addEventListener('click', async () => {
-      const raw = ($('networkRangeInput').value || '10.137.73.0/24').trim();
-      let payload = { cidr: '10.137.73.0/24' };
-
-      if (raw.includes('/')) {
-        payload = { cidr: raw };
-      } else if (raw.includes('-')) {
-        const [start, end] = raw.split('-').map((part) => part.trim());
-        payload = { startIp: start, endIp: end };
-      } else if (raw) {
-        payload = { cidr: `${raw}/24` };
+    function tickKeepAliveCountdown() {
+      if (!state.keepAlive) {
+        state.keepAliveCountdownMs = 0;
+        updateStats();
+        return;
       }
+      const countdown = Math.max(0, state.keepAliveCountdownMs - 1000);
+      state.keepAliveCountdownMs = countdown;
+      const button = $('keepAliveToggleBtn');
+      button.textContent = state.keepAlive ? `KeepAlive ${formatKeepAliveLabel()}` : 'KeepAlive OFF';
+      updateStats();
+      if (countdown <= 0) {
+        state.keepAliveCountdownMs = state.keepAliveIntervalMs;
+      }
+    }
 
-      state.scanning = true;
-      renderScanResults();
-      const result = await api('/api/discover', 'POST', payload);
-      state.scanning = false;
-      state.scanResults = Array.isArray(result.devices) ? result.devices : [];
-      appendLog(`DISCOVER -> ${result.count || 0} TV(s)`);
-      showToast(result.status === 'ok' ? `Discovered ${result.count || 0}` : result.message || 'Error');
-      renderScanResults();
-      await loadDevices();
-      await loadKeepAliveState();
-    });
+    $('networkRangeInput').value = '10.137.73.0/24';
 
     $('scanRangeBtn').addEventListener('click', async () => {
       if (state.scanning) {
@@ -1291,9 +1652,10 @@ ssap://audio/volumeDown</div>
     });
 
     $('refreshBtn').addEventListener('click', async () => {
+      const result = await api('/api/recheck', 'POST');
       await loadDevices();
       await loadKeepAliveState();
-      showToast('Status refreshed');
+      showToast(result.status === 'ok' ? `Recheck: ${result.online || 0}/${result.total || 0} online` : result.message || 'Status refreshed');
     });
 
     $('keysStatusBtn').addEventListener('click', async () => {
@@ -1303,6 +1665,38 @@ ssap://audio/volumeDown</div>
       const missing = entries.length - saved;
       const message = entries.length ? `Saved keys: ${saved} / Missing: ${missing}` : 'No key data available';
       appendLog(`KEY STATUS -> ${message}`);
+
+      const list = $('keysDetailList');
+      list.innerHTML = '';
+
+      if (!entries.length) {
+        list.innerHTML = '<div class="device-item"><div class="device-name">No key data available</div></div>';
+      } else {
+        entries.forEach((entry) => {
+          const item = document.createElement('div');
+          item.className = 'device-item';
+          const keyValue = entry.keyValue || entry.keyPreview || 'N/A';
+          item.innerHTML = `
+            <div class="device-main">
+              <div class="device-name">${entry.name || 'Unknown device'}</div>
+              <div class="device-meta">
+                <span class="status-inline">
+                  <span class="dot ${entry.hasKey ? 'online' : 'offline'}"></span>
+                  <span>${entry.hasKey ? 'Key saved' : 'Missing key'}</span>
+                </span>
+                · ${entry.ip || 'Unknown IP'}
+              </div>
+              <div class="device-meta">Reset count: ${entry.resetCount || 0}</div>
+            </div>
+            <div class="device-meta">Assigned key</div>
+            <div class="key-value">${entry.hasKey ? keyValue : 'No key assigned'}</div>
+            <div class="device-meta">Status: ${entry.status || 'unknown'}</div>
+          `;
+          list.appendChild(item);
+        });
+      }
+
+      $('keysDetailModal').hidden = false;
       showToast(message);
     });
 
@@ -1356,52 +1750,114 @@ ssap://audio/volumeDown</div>
       showToast(ok ? `Power off sent to ${ok} TV(s)` : 'Error');
     });
 
-    $('volumeDownBtn').addEventListener('click', async () => {
-      const targets = getSelectedDevices();
-      if (!targets.length) return showToast('Select a TV first');
-      const results = await Promise.all(targets.map(async (device) => {
-        const result = await api(`/api/devices/${device.id}/command`, 'POST', { command: 'ssap://audio/volumeDown' });
-        appendLog(`VOLUME DOWN -> ${device.name} | ${result.status || 'error'}`);
-        return { device, result };
-      }));
-      const ok = results.filter(({ result }) => result.status === 'ok').length;
-      showToast(ok ? `Volume down sent to ${ok} TV(s)` : 'Error');
+    $('dashboardBtn').addEventListener('click', () => {
+      openMouseTouchpad();
     });
 
-    $('volumeUpBtn').addEventListener('click', async () => {
-      const targets = getSelectedDevices();
-      if (!targets.length) return showToast('Select a TV first');
-      const results = await Promise.all(targets.map(async (device) => {
-        const result = await api(`/api/devices/${device.id}/command`, 'POST', { command: 'ssap://audio/volumeUp' });
-        appendLog(`VOLUME UP -> ${device.name} | ${result.status || 'error'}`);
-        return { device, result };
-      }));
-      const ok = results.filter(({ result }) => result.status === 'ok').length;
-      showToast(ok ? `Volume up sent to ${ok} TV(s)` : 'Error');
+    $('clearSelectionBtn').addEventListener('click', clearSelection);
+
+    $('groupFilterBtn').addEventListener('click', () => {
+      const menu = $('groupFilterMenu');
+      if (!menu) return;
+      menu.hidden = !menu.hidden;
     });
 
-    $('dashboardBtn').addEventListener('click', async () => {
-      const targets = getSelectedDevices();
-      if (!targets.length) return showToast('Select a TV first');
-      const results = await Promise.all(targets.map(async (device) => {
-        const result = await api(`/api/devices/${device.id}/command`, 'POST', { command: 'ssap://system.launcher/open', payload: { target: 'https://www.google.com' } });
-        appendLog(`OPEN -> ${device.name} | ${result.status || 'error'}`);
-        return { device, result };
-      }));
-      const ok = results.filter(({ result }) => result.status === 'ok').length;
-      showToast(ok ? `Opened on ${ok} TV(s)` : 'Error');
+    $('groupFilterResetBtn').addEventListener('click', () => {
+      state.hiddenGroups = {};
+      renderGroupFilterMenu();
+      renderCards();
+      renderOverviewList();
     });
 
-    $('reloadBtn').addEventListener('click', async () => {
+    document.addEventListener('click', (event) => {
+      const menu = $('groupFilterMenu');
+      const button = $('groupFilterBtn');
+      if (!menu || !button) return;
+      if (!menu.contains(event.target) && !button.contains(event.target)) {
+        menu.hidden = true;
+      }
+    });
+
+    function openMouseTouchpad() {
       const targets = getSelectedDevices();
       if (!targets.length) return showToast('Select a TV first');
-      const results = await Promise.all(targets.map(async (device) => {
-        const result = await api(`/api/devices/${device.id}/command`, 'POST', { command: 'ssap://system.launcher/close' });
-        appendLog(`RELOAD -> ${device.name} | ${result.status || 'error'}`);
-        return { device, result };
-      }));
-      const ok = results.filter(({ result }) => result.status === 'ok').length;
-      showToast(ok ? `Reload sent to ${ok} TV(s)` : 'Error');
+      $('touchpadTargetCount').textContent = String(targets.length);
+      $('mouseTouchpadModal').hidden = false;
+    }
+
+    function closeMouseTouchpad() {
+      $('mouseTouchpadModal').hidden = true;
+    }
+
+    async function sendTouchpadAction(action) {
+      const targets = getSelectedDevices();
+      if (!targets.length) {
+        showToast('Select a TV first');
+        return;
+      }
+      const ids = targets.map((device) => device.id);
+      const result = await api('/api/web-dashboard/pointer', 'POST', { targets: ids, action });
+      if (result.status !== 'ok') {
+        showToast(result.message || 'Touchpad action failed');
+      }
+    }
+
+    $('closeMouseTouchpadModalBtn').addEventListener('click', closeMouseTouchpad);
+    $('touchpadOpenBtn').addEventListener('click', async () => {
+      const targets = getSelectedDevices();
+      if (!targets.length) return showToast('Select a TV first');
+      const result = await api('/api/web-dashboard/launch', 'POST', { targets: targets.map((device) => device.id) });
+      showToast(result.status === 'ok' ? 'Dashboard opened' : result.message || 'Error');
+    });
+    $('touchpadClickBtn').addEventListener('click', () => sendTouchpadAction('click'));
+    $('touchpadBackBtn').addEventListener('click', () => sendTouchpadAction('back'));
+
+    const touchpadSurface = $('touchpadSurface');
+    let touchpadLastPoint = null;
+
+    touchpadSurface.addEventListener('pointerdown', (event) => {
+      touchpadLastPoint = { x: event.clientX, y: event.clientY };
+      touchpadSurface.setPointerCapture(event.pointerId);
+    });
+
+    touchpadSurface.addEventListener('pointermove', async (event) => {
+      if (!touchpadLastPoint) return;
+      const dx = Math.round(event.clientX - touchpadLastPoint.x);
+      const dy = Math.round(event.clientY - touchpadLastPoint.y);
+      touchpadLastPoint = { x: event.clientX, y: event.clientY };
+      if (!dx && !dy) return;
+      const targets = getSelectedDevices();
+      if (!targets.length) return;
+      const result = await api('/api/web-dashboard/pointer', 'POST', {
+        targets: targets.map((device) => device.id),
+        action: 'move',
+        dx,
+        dy,
+        packetSize: 8,
+      });
+      if (result.status !== 'ok') {
+        showToast(result.message || 'Touchpad move failed');
+      }
+    });
+
+    touchpadSurface.addEventListener('pointerup', () => {
+      touchpadLastPoint = null;
+    });
+
+    touchpadSurface.addEventListener('pointerleave', () => {
+      touchpadLastPoint = null;
+    });
+
+    touchpadSurface.addEventListener('dblclick', () => sendTouchpadAction('click'));
+    touchpadSurface.addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+      sendTouchpadAction('back');
+    });
+
+    $('mouseTouchpadModal').addEventListener('click', (event) => {
+      if (event.target === $('mouseTouchpadModal')) {
+        closeMouseTouchpad();
+      }
     });
 
     $('saveDeviceBtn').addEventListener('click', async () => {
@@ -1424,6 +1880,11 @@ ssap://audio/volumeDown</div>
       }
 
       showToast(result.status === 'ok' ? 'Saved' : result.message || 'Error');
+      if (result.status === 'ok') {
+        await loadDevices();
+        closeConfigModal();
+        return;
+      }
       await loadDevices();
       const selected = getSelectedDevice();
       if (selected) fillForm(selected);
@@ -1439,28 +1900,15 @@ ssap://audio/volumeDown</div>
     });
 
     $('clearFormBtn').addEventListener('click', clearForm);
-    $('configOpenBtn').addEventListener('click', () => {
-      const selected = getSelectedDevice();
-      if (!selected) {
-        showToast('Select a TV first');
-        return;
-      }
-      openConfigModal(selected.id);
-    });
 
     $('closeConfigModalBtn').addEventListener('click', closeConfigModal);
+    $('closeKeysDetailModalBtn').addEventListener('click', () => { $('keysDetailModal').hidden = true; });
 
     document.querySelectorAll('.tab').forEach((btn) => {
       btn.addEventListener('click', () => {
         const tab = btn.dataset.tab;
         activateTab(tab);
       });
-    });
-
-    $('deviceConfigModal').addEventListener('click', (event) => {
-      if (event.target === $('deviceConfigModal')) {
-        closeConfigModal();
-      }
     });
 
     $('sendCommandBtn').addEventListener('click', async () => {
@@ -1488,7 +1936,11 @@ ssap://audio/volumeDown</div>
     setInterval(() => {
       loadDevices();
       loadKeepAliveState();
+      tickKeepAliveCountdown();
     }, 8000);
+    setInterval(() => {
+      tickKeepAliveCountdown();
+    }, 1000);
   </script>
 </body>
 </html>

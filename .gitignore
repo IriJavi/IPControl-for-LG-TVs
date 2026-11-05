@@ -1,0 +1,8 @@
+node_modules/
+.vs/
+.lgtv-keys-temp/
+keys-reset-stats.json
+*.bak
+*.old
+debug-reconnect.js
+commands.json.old

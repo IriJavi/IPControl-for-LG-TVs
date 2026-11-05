@@ -14,7 +14,61 @@ class DeviceStore {
     this.inventoryPath = path.join(this.rootDir, 'devices.json');
     this.keysPath = path.join(this.rootDir, 'keys.json');
     this.inventory = this.readJson(this.inventoryPath, []);
-    this.keys = this.readJson(this.keysPath, {});
+    this.keys = this.normalizeKeyMap(this.readJson(this.keysPath, {}));
+  }
+
+  normalizeKeyIdentifier(identifier) {
+    if (identifier === null || identifier === undefined) return null;
+    const raw = String(identifier).trim();
+    if (!raw) return null;
+    if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(raw)) return raw;
+    const mac = normalizeMac(raw);
+    if (mac) return mac;
+    return raw;
+  }
+
+  normalizeKeyMap(rawMap = {}) {
+    const next = {};
+    const seen = new Set();
+
+    Object.entries(rawMap || {}).forEach(([key, value]) => {
+      if (typeof value !== 'string') return;
+      const trimmed = value.trim();
+      if (!trimmed || trimmed === '{}' || !/^[a-f0-9]{16,}$/i.test(trimmed)) return;
+      if (String(key).includes('.key.mac') || String(key).includes('.key') || String(key).toLowerCase().includes('wired') || String(key).toLowerCase().includes('wifi')) {
+        return;
+      }
+
+      const normalizedKey = this.normalizeKeyIdentifier(key);
+      if (!normalizedKey) return;
+      const isIp = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(normalizedKey);
+      const isMac = !!normalizeMac(normalizedKey);
+      if (!isIp && !isMac) return;
+
+      const canonicalKey = isIp ? normalizedKey : normalizeMac(normalizedKey);
+      if (seen.has(canonicalKey)) return;
+      seen.add(canonicalKey);
+      next[canonicalKey] = trimmed;
+    });
+
+    return next;
+  }
+
+  getKeyAliases(identifier) {
+    const aliases = new Set();
+    const raw = typeof identifier === 'string' ? identifier.trim() : '';
+    if (!raw) return [];
+
+    const normalizedMac = normalizeMac(raw);
+    if (normalizedMac) aliases.add(normalizedMac);
+    if (raw.includes(':')) aliases.add(raw.replace(/:/g, ''));
+    aliases.add(raw);
+
+    if (/^(?:\d{1,3}\.){3}\d{1,3}$/.test(raw)) {
+      aliases.add(raw);
+    }
+
+    return [...aliases].filter(Boolean);
   }
 
   readJson(filePath, fallback) {
@@ -53,6 +107,22 @@ class DeviceStore {
 
   listDevices() {
     return this.inventory.map((device) => this.normalizeDevice(device));
+  }
+
+  filterDiscoveredDevices(discovered = []) {
+    const existing = new Set();
+    for (const device of this.inventory) {
+      const normalized = this.normalizeDevice(device);
+      if (normalized.id) existing.add(String(normalized.id));
+      if (normalized.ip) existing.add(String(normalized.ip));
+      if (normalized.mac) existing.add(String(normalized.mac).toLowerCase());
+    }
+
+    return (Array.isArray(discovered) ? discovered : []).filter((device) => {
+      const normalized = this.normalizeDevice(device);
+      const candidates = [normalized.id, normalized.ip, normalized.mac].filter(Boolean).map((value) => String(value));
+      return !candidates.some((value) => existing.has(value) || existing.has(value.toLowerCase()));
+    });
   }
 
   getDeviceById(id) {
@@ -107,19 +177,31 @@ class DeviceStore {
 
   setKey(identifier, key) {
     const value = String(key || '').trim();
-    if (!value) return null;
+    if (!value || !/^[a-f0-9]{16,}$/i.test(value)) return null;
 
-    const keysToWrite = new Set();
-    const normalized = normalizeMac(identifier);
-    if (normalized) keysToWrite.add(normalized);
+    const normalizedMap = this.normalizeKeyMap(this.keys);
+    const aliases = new Set(this.getKeyAliases(identifier));
 
-    const rawIdentifier = typeof identifier === 'string' ? identifier.trim() : '';
-    if (rawIdentifier) keysToWrite.add(rawIdentifier);
-
-    for (const entry of keysToWrite) {
-      this.keys[entry] = value;
+    const normalizedTargetMac = normalizeMac(identifier);
+    if (normalizedTargetMac) {
+      const matchingDevice = this.inventory.find((device) => normalizeMac(device.mac) === normalizedTargetMac || device.id === identifier || device.ip === identifier);
+      if (matchingDevice?.ip) aliases.add(matchingDevice.ip);
+      if (matchingDevice?.mac) aliases.add(normalizeMac(matchingDevice.mac));
     }
 
+    const rawTargetIp = /^\d{1,3}(?:\.\d{1,3}){3}$/.test(String(identifier || '')) ? String(identifier) : '';
+    if (rawTargetIp) {
+      const matchingDevice = this.inventory.find((device) => device.ip === rawTargetIp || device.id === rawTargetIp || normalizeMac(device.mac) === rawTargetIp);
+      if (matchingDevice?.mac) aliases.add(normalizeMac(matchingDevice.mac));
+      if (matchingDevice?.ip) aliases.add(matchingDevice.ip);
+    }
+
+    for (const entry of aliases) {
+      const canonical = this.normalizeKeyIdentifier(entry);
+      if (canonical) normalizedMap[canonical] = value;
+    }
+
+    this.keys = normalizedMap;
     this.writeJson(this.keysPath, this.keys);
     return value;
   }
@@ -127,11 +209,11 @@ class DeviceStore {
   getKey(identifier) {
     if (!identifier) return null;
 
-    const normalized = normalizeMac(identifier);
-    if (normalized && this.keys[normalized]) return this.keys[normalized];
-
-    const rawIdentifier = String(identifier).trim();
-    if (rawIdentifier && this.keys[rawIdentifier]) return this.keys[rawIdentifier];
+    const aliases = this.getKeyAliases(identifier);
+    for (const alias of aliases) {
+      const direct = this.keys[alias];
+      if (direct) return direct;
+    }
 
     return null;
   }
